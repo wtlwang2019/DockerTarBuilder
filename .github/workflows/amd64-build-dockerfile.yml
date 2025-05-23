@@ -1,0 +1,27 @@
+name: Build Docker Image (No Push)
+
+on: 
+  workflow_dispatch:
+    inputs:
+      project_path:
+        description: 'Dokerfile 所属的项目路径'
+        required: true
+        default: 'test'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image locally
+        uses: docker/build-push-action@v5
+        with:
+          context: .                # 构建上下文路径
+          file: ./Dockerfile        # Dockerfile路径
+          push: false               # 禁用推送
+          tags: my-image:local      # 本地临时标签

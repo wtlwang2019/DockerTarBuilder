@@ -32,12 +32,13 @@ jobs:
           image: ${{ github.event.inputs.project_path }}
           image_name: ${{ github.event.inputs.project_path }}
         run: |
-            docker images
+            pwd
+            ls
+            docker images -a
             docker save "${image}:local" -o "${image_name}-amd64.tar"
             gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
             rm "${image_name}-amd64.tar"
-            pwd
-            ls
+
   
       - name: Upload artifact
         uses: actions/upload-artifact@v4

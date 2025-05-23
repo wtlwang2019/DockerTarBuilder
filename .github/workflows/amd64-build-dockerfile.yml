@@ -18,14 +18,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image locally
-        uses: docker/build-push-action@v5
-        with:
-          context: ./${{ github.event.inputs.project_path }}               # 构建上下文路径
-          file: ./${{ github.event.inputs.project_path }}/Dockerfile        # Dockerfile路径
-          push: false               # 禁用推送
-          platforms: "linux/amd64"
-          tags: ${{ github.event.inputs.project_path }}:local      # 本地临时标签
+      # - name: Build image locally
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./${{ github.event.inputs.project_path }}               # 构建上下文路径
+      #     file: ./${{ github.event.inputs.project_path }}/Dockerfile        # Dockerfile路径
+      #     push: false               # 禁用推送
+      #     platforms: "linux/amd64"
+      #     tags: ${{ github.event.inputs.project_path }}:local      # 本地临时标签
           
       - name: Pull Docker Images and Package
         env: 
@@ -34,6 +34,8 @@ jobs:
         run: |
             pwd
             ls
+            cd ${image}
+            docker build -t ${image}:local .
             docker images -a
             docker save "${image}:local" -o "${image_name}-amd64.tar"
             gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"

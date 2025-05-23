@@ -24,14 +24,16 @@ jobs:
           context: ./${{ github.event.inputs.project_path }}               # 构建上下文路径
           file: ./${{ github.event.inputs.project_path }}/Dockerfile        # Dockerfile路径
           push: false               # 禁用推送
+          platforms: "linux/amd64"
           tags: ${{ github.event.inputs.project_path }}:local      # 本地临时标签
           
       - name: Pull Docker Images and Package
         env: 
-          image: "${{ github.event.inputs.project_path }}:local"
-          image_name: "${{ github.event.inputs.project_path }}_local"
+          image: ${{ github.event.inputs.project_path }}
+          image_name: ${{ github.event.inputs.project_path }}
         run: |
-            docker save "${image}" -o "${image_name}-amd64.tar"
+            docker images
+            docker save "${image}:local" -o "${image_name}-amd64.tar"
             gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
             rm "${image_name}-amd64.tar"
             pwd

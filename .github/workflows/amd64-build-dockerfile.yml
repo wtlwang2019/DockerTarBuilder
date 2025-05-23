@@ -40,6 +40,8 @@ jobs:
             docker save "${image}:local" -o "${image_name}-amd64.tar"
             gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
             rm "${image_name}-amd64.tar"
+            ls
+            cp *.tar.gz ../
 
   
       - name: Upload artifact

@@ -1,4 +1,4 @@
-name: Get-AMD64-Docker-Images-Release
+name: Search-Dockerhub
 
 on:
   workflow_dispatch:

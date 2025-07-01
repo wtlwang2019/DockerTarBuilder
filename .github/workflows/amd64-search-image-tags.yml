@@ -20,7 +20,7 @@ jobs:
           images="${{ github.event.inputs.docker_images }}"
           IFS=',' read -r -a image_array <<< "$images"
           for image in "${image_array[@]}"; do
-            curl https://registry.hub.docker.com/v1/repositories/${image}/tags > "${image}.tags.txt"
+            curl https://registry.hub.docker.com/v2/repositories/${image}/tags > "${image}.tags.txt"
           done
 
       - name: List generated files (debug step)

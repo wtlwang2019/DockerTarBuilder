@@ -25,7 +25,7 @@ jobs:
           namespace="${{ github.event.inputs.namespace}}"
           IFS=',' read -r -a image_array <<< "$images"
           for image in "${image_array[@]}"; do
-            curl https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 > "${image}.tags.txt"
+            curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 
           done
           ls -l
           tar -czvf tags.tar.gz *.txt

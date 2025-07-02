@@ -27,7 +27,7 @@ jobs:
           for image in "${image_array[@]}"; do
             curl https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 > "${image}.tags.txt"
           done
-          gzip -c *.tags.txt > "$tags.txt.gz"
+          gzip -c *.tags.txt > "tags.txt.gz"
 
       - name: List generated files (debug step)
         run: |

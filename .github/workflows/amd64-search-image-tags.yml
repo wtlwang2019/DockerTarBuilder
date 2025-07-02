@@ -3,10 +3,14 @@ name: Search-Image-tags
 on:
   workflow_dispatch:
     inputs:
+      namespace:
+        description: '请填写docker镜像的namespace'
+        required: true
+        default: 'library'    
       docker_images:
         description: '请填写docker镜像名称,多个用英文逗号分开'
         required: true
-        default: 'alpine,alpine/curl,busybox'
+        default: 'alpine,nginx,busybox'
 
 jobs:
   search_and_package:
@@ -18,9 +22,10 @@ jobs:
       - name: Search DockerHub Images tags
         run: |
           images="${{ github.event.inputs.docker_images }}"
+          namespace="${{ github.event.inputs.namespace}}"
           IFS=',' read -r -a image_array <<< "$images"
           for image in "${image_array[@]}"; do
-            curl https://registry.hub.docker.com/v2/repositories/library/${image}/tags?page=1&page_size=50 > "${image}.tags.txt"
+            curl https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 > "${image}.tags.txt"
           done
 
       - name: List generated files (debug step)

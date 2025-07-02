@@ -1,0 +1,17 @@
+name: Delete old workflow runs
+on:
+  schedule:
+    # 每天10点自动执行
+    - cron: '10 10 * * *'  
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          token: ${{ github.token }}  # 使用GITHUB_TOKEN
+          repository: ${{ github.repository }}  # 当前仓库
+          retain_days: 10  # 保留30天内的运行
+          keep_minimum_runs: 5  # 至少保留最近6次运行
+

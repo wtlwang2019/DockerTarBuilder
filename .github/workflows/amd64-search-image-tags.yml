@@ -24,11 +24,27 @@ jobs:
           images="${{ github.event.inputs.docker_images }}"
           namespace="${{ github.event.inputs.namespace}}"
           IFS=',' read -r -a image_array <<< "$images"
+          success=false
           for image in "${image_array[@]}"; do
-            curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 
+            if curl -f -o "${image}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50"; then
+              echo "Downloaded tags for $image"
+              success=true
+            else
+              echo "Failed to fetch tags for $image" >&2
+            fi
           done
+          if ! $success; then
+            echo "No tags files were downloaded. Exiting." >&2
+            exit 2
+          fi
           ls -l
           tar -czvf tags.tar.gz *.txt
+          rm *.txt
+          # for image in "${image_array[@]}"; do
+          #   curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 
+          # done
+          # ls -l
+          # tar -czvf tags.tar.gz *.txt
           #gzip -c *.tags.txt > "tags.txt.gz"
 
       - name: List generated files (debug step)

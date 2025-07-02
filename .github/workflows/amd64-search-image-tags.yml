@@ -27,11 +27,12 @@ jobs:
           for image in "${image_array[@]}"; do
             curl https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 > "${image}.tags.txt"
           done
+          gzip -c *.tags.txt > "$tags.txt.gz"
 
       - name: List generated files (debug step)
         run: |
           echo "Preparing docker images list (.txt) files:"
-          find $GITHUB_WORKSPACE -name "*.txt"
+          find $GITHUB_WORKSPACE -name "*.txt.gz"
           release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
           echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
 
@@ -51,11 +52,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload DockerHub tags.txt as release assets
+      - name: Upload DockerHub tags.txt.gz as release assets
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: DockerTarBuilder-AMD64
-          files: ${{ github.workspace }}/*.txt
+          files: ${{ github.workspace }}/*.txt.gz
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

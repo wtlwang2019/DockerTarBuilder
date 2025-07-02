@@ -21,6 +21,7 @@ jobs:
 
       - name: Search DockerHub Images tags
         run: |
+          df -h
           images="${{ github.event.inputs.docker_images }}"
           namespace="${{ github.event.inputs.namespace}}"
           IFS=',' read -r -a image_array <<< "$images"

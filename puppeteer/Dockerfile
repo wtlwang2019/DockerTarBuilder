@@ -16,8 +16,8 @@ RUN apt-get update && \
     apt-get install -y chromium && \
     apt-get clean
 
-COPY ../puppeteer /project
-COPY tsconfig.json /tsconfig.json
+COPY . /project
+COPY tsconfig.base.json /tsconfig.json
 
 WORKDIR /project
 

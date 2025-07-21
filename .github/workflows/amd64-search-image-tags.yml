@@ -3,6 +3,10 @@ name: Search-Image-tags
 on:
   workflow_dispatch:
     inputs:
+      page_size:
+        description: '请填写page_size'
+        required: true
+        default: '50' 
       namespace:
         description: '请填写docker镜像的namespace'
         required: true
@@ -24,10 +28,11 @@ jobs:
           df -h
           images="${{ github.event.inputs.docker_images }}"
           namespace="${{ github.event.inputs.namespace}}"
+          pagesize="${{ inputs.page_size }}"
           IFS=',' read -r -a image_array <<< "$images"
           success=false
           for image in "${image_array[@]}"; do
-            if curl -f -o "${image}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50"; then
+            if curl -f -o "${image}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=${pagesize}"; then
               echo "Downloaded tags for $image"
               success=true
             else

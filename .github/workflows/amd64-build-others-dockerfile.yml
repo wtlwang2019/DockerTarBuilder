@@ -7,6 +7,10 @@ on:
         description: '仓库路径'
         required: true
         default: 'wtlwang2019/llama.cpp'
+      image_name:
+        description: '镜像名称'
+        required: true
+        default: 'llama-full'        
 
 jobs:
   build:
@@ -25,27 +29,28 @@ jobs:
           pwd
           ls
           ls -l 
+          df -h
           
-      # - name: Pull Docker Images and Package
-      #   env: 
-      #     image: ${{ github.event.inputs.project_path }}
-      #     image_name: ${{ github.event.inputs.project_path }}
-      #   run: |
-      #       pwd
-      #       ls
-      #       cd ${image}
-      #       docker build -t ${image}:local .
-      #       docker images -a
-      #       docker save "${image}:local" -o "${image_name}-amd64.tar"
-      #       gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
-      #       rm "${image_name}-amd64.tar"
-      #       ls
-      #       cp *.tar.gz ../
+      - name: Pull Docker Images and Package
+        env: 
+          image: ${{ inputs.image_name }}
+          image_name: ${{ inputs.image_name }}
+        run: |
+            pwd
+            ls
+            cd ${image}
+            docker build -t ${image}:local .
+            docker images -a
+            docker save "${image}:local" -o "${image_name}-amd64.tar"
+            gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
+            rm "${image_name}-amd64.tar"
+            ls
+            # cp *.tar.gz ../
 
   
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: my-artifact
-      #     path: ${{ github.workspace }}/*.tar.gz
-      #     retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: ${{ github.workspace }}/*.tar.gz
+          retention-days: 7  # 将保留天数设置为 1 天 最多可设置90天

@@ -38,7 +38,6 @@ jobs:
         run: |
             pwd
             ls
-            cd ${image}
             docker build -t ${image}:local .
             docker images -a
             docker save "${image}:local" -o "${image_name}-amd64.tar"

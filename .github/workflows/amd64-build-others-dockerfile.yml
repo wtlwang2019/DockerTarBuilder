@@ -1,4 +1,4 @@
-name: Build Docker Image (No Push)
+name: Build Other Repository Docker Image (No Push)
 
 on: 
   workflow_dispatch:

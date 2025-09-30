@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       docker_images:
-        description: '请填写docker镜像名称,多个用英文逗号分开'
+        description: '请填写docker镜像名称,多个用英文逗号分开; 名称里不能有/'
         required: true
-        default: 'alpine,alpine/curl,busybox'
+        default: 'alpine,curl,busybox'
 
 jobs:
   pull_and_package:

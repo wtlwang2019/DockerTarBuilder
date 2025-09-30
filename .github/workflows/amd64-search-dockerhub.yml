@@ -20,7 +20,7 @@ jobs:
           images="${{ github.event.inputs.docker_images }}"
           IFS=',' read -r -a image_array <<< "$images"
           for image in "${image_array[@]}"; do
-            docker search  --no-trunc "${image}" > "${image}.search.txt"
+            docker search --limit 100 --no-trunc "${image}" > "${image}.search.txt"
           done
 
       - name: List generated files (debug step)

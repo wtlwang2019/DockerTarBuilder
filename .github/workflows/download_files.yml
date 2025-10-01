@@ -1,4 +1,4 @@
-name: Search-huggingface-models
+name: download_files
 
 on:
   workflow_dispatch:
@@ -20,11 +20,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Search DockerHub Images
+      - name: download_file
         run: |
-          pip install -U "huggingface_hub[cli]"
-          keys="${{ inputs.search_keys }}"
-          huggingface-cli search "${keys}" --type model  > "models.search.txt"
+          url="${{ inputs.url }}"
+          filename="${{ inputs.target_filename }}"
+          opt="-O"
+          if [ -z "$(echo "$filename" | xargs)" ]; then opt="-o ${filename}" ; fi
+          curl "$opt" -L "${url}"
           
 
       - name: List generated files (debug step)
@@ -49,7 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload huggingface Hub Search.txt as release assets
+      - name: Upload download file as release assets
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: DockerTarBuilder-AMD64

@@ -8,8 +8,8 @@ on:
         required: true
         default: 'https://huggingface.co/api/models?search=qwen'
       target_filename:
-        description: '请填写保存的文件名'
-        required: false
+        description: '请填写保存的文件名,不指定名称输入null'
+        required: true
         default: 'result.txt'
         
 
@@ -25,7 +25,7 @@ jobs:
           url="${{ inputs.url }}"
           filename="${{ inputs.target_filename }}"
           opt="-o ${filename}"
-          if [ -z "$(echo "$filename" | xargs)" ]; then opt="-O" ; fi
+          if [ "$filename" = "null" ]; then opt="-O" ; fi
           echo "curl -L ${opt} ${url}"
           curl -L $opt "${url}"
           ls -l

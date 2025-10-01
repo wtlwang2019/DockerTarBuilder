@@ -1,4 +1,4 @@
-name: Search-Dockerhub
+name: Search-huggingface-models
 
 on:
   workflow_dispatch:

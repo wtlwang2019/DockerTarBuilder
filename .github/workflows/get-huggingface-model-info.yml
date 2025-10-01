@@ -1,12 +1,12 @@
-name: Search-huggingface-models
+name: get-huggingface-model-info
 
 on:
   workflow_dispatch:
     inputs:
-      search_keys:
-        description: '请填写搜索模型的关键字,多个用逗号分开'
+      modelId:
+        description: '请填写正规的modelId'
         required: true
-        default: 'qwen 0.5B gguf'
+        default: 'Qwen/Qwen2.5-0.5B-Instruct-GGUF'
 
 jobs:
   pull_and_package:
@@ -15,11 +15,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Search DockerHub Images
+      - name: get model repo info
         run: |
           pip install -U "huggingface_hub[cli]"
-          keys="${{ inputs.search_keys }}"
-          huggingface-cli search "${keys}" --type model  > "models.search.txt"
+          model_id="${{ inputs.modelId }}"
+          huggingface-cli repo info ${model_id}  > "model.info.txt"
           
 
       - name: List generated files (debug step)
@@ -44,7 +44,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload huggingface Hub Search.txt as release assets
+      - name: Upload huggingface model.info.txt as release assets
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: DockerTarBuilder-AMD64

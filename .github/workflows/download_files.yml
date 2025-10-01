@@ -58,5 +58,6 @@ jobs:
           tag_name: DockerTarBuilder-AMD64
           files: ${{ github.workspace }}/*.txt
           token: ${{ secrets.GITHUB_TOKEN }}
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

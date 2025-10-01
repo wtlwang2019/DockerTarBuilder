@@ -24,9 +24,10 @@ jobs:
         run: |
           url="${{ inputs.url }}"
           filename="${{ inputs.target_filename }}"
-          opt="-O"
-          if [ -z "$(echo "$filename" | xargs)" ]; then opt="-o ${filename}" ; fi
+          opt="-o ${filename}"
+          if [ -z "$(echo "$filename" | xargs)" ]; then opt="-O" ; fi
           curl "$opt" -L "${url}"
+          ls -l
           
 
       - name: List generated files (debug step)

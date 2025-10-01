@@ -27,7 +27,7 @@ jobs:
           opt="-o ${filename}"
           if [ -z "$(echo "$filename" | xargs)" ]; then opt="-O" ; fi
           echo "curl -L ${opt} ${url}"
-          curl -L "${opt} ${url}"
+          curl -L "${opt}" "${url}"
           ls -l
           
 

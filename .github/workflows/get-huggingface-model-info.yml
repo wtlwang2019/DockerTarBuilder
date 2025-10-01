@@ -19,7 +19,8 @@ jobs:
         run: |
           pip install -U "huggingface_hub[cli]"
           model_id="${{ inputs.modelId }}"
-          huggingface-cli repo info ${model_id}  > "model.info.txt"
+          huggingface-cli -h
+          huggingface-cli repo ls ${model_id}  > "model.info.txt"
           
 
       - name: List generated files (debug step)

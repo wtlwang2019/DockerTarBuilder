@@ -1,4 +1,4 @@
-name: get-huggingface-model-info
+name: huggingface-model-info
 
 on:
   workflow_dispatch:

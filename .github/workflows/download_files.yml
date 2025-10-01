@@ -26,7 +26,8 @@ jobs:
           filename="${{ inputs.target_filename }}"
           opt="-o ${filename}"
           if [ -z "$(echo "$filename" | xargs)" ]; then opt="-O" ; fi
-          curl -L "${opt}" "${url}"
+          echo "curl -L ${opt} ${url}"
+          curl -L "${opt} ${url}"
           ls -l
           
 

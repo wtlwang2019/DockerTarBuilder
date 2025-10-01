@@ -9,7 +9,7 @@ on:
         default: 'https://huggingface.co/api/models?search=qwen'
       target_filename:
         description: '请填写保存的文件名'
-        required: true
+        required: false
         default: 'result.txt'
         
 

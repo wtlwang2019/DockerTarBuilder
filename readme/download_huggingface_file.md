@@ -11,6 +11,6 @@ curl -s https://huggingface.co/api/models/Qwen/Qwen2.5-0.5B-Instruct-GGUF
 
 ### 3. 下载文件
 
-https://huggingface.co/<repo>/resolve/<branch>/<filename>?download=true
+ "https://huggingface.co/<repo>/resolve/<branch>/<filename>?download=true"
 
 https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf?download=true

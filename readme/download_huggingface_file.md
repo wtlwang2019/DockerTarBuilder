@@ -8,6 +8,7 @@
 ### 2. 获取指定modelId下模型文件列表
 
 `https://huggingface.co/api/models/<modelId>`
+
 curl -s https://huggingface.co/api/models/Qwen/Qwen2.5-0.5B-Instruct-GGUF
 
 ### 3. 下载文件

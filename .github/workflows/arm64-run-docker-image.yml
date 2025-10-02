@@ -1,0 +1,52 @@
+name: Build ARM64 Docker Image (No Push)
+
+on: 
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'docker image的tag'
+        required: true
+        default: 'ghcr.io/wtlwang2019/llamacpp:arm64'
+      cmd:
+        description: '运行镜像的命令, 例如/bin/bash'
+        required: true
+        default: '-h'      
+      
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # - name: Build image locally
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./${{ github.event.inputs.project_path }}               # 构建上下文路径
+      #     file: ./${{ github.event.inputs.project_path }}/Dockerfile        # Dockerfile路径
+      #     push: false               # 禁用推送
+      #     platforms: "linux/amd64"
+      #     tags: ${{ github.event.inputs.project_path }}:local      # 本地临时标签
+          
+      - name: Run arm64 docker image
+        env: 
+          image: ${{ inputs.image_tag }}
+          cmd: ${{ inputs.cmd }}
+        run: |
+            pwd
+            ls
+            docker pull $image
+            docker images -a
+            docker run --rm -it  ${image}  $cmd
+
+  
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: ${{ github.workspace }}/*.tar.gz
+          retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天

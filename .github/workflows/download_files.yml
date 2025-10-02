@@ -22,6 +22,8 @@ jobs:
 
       - name: download_file
         run: |
+          mkdir .download || rm -r .download/
+          cd .download
           url="${{ inputs.url }}"
           filename="${{ inputs.target_filename }}"
           opt="-o ${filename}"
@@ -29,6 +31,7 @@ jobs:
           echo "curl -L ${opt} ${url}"
           curl -L $opt "${url}"
           ls -l
+          cd ..
           
 
       - name: List generated files (debug step)
@@ -57,7 +60,7 @@ jobs:
         uses: softprops/action-gh-release@v2.3.3
         with:
           tag_name: DockerTarBuilder-AMD64
-          files: ${{ github.workspace }}/*.txt
+          files: ${{ github.workspace }}/.download/*
           token: ${{ secrets.GITHUB_TOKEN }}
           overwrite_files: true
         env:

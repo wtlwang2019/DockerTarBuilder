@@ -41,7 +41,7 @@ jobs:
             ls
             docker pull $image
             docker images -a
-            docker run --rm -it  ${image}  $cmd
+            docker run --rm -i  ${image}  $cmd
 
   
       - name: Upload artifact

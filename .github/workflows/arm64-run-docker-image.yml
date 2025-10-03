@@ -30,17 +30,25 @@ jobs:
       - name: Run arm64 docker image
         env: 
           image: ${{ inputs.image_tag }}
-          cmd: ${{ inputs.cmd }}
+          # cmd: ${{ inputs.cmd }}
           entrypoint: ${{ inputs.entrypoint }}
         run: |
             pwd
             ls
-            opt="--entrypoint $entrypoint"
-            if [ -z "$entrypoint" ]; then opt='' ; fi
+            cmd="${{ inputs.cmd }}"
             docker pull $image
             docker images -a
-            echo "docker run --rm -i $opt ${image}  $cmd"
-            docker run --rm -i $opt  ${image}  ${cmd}
+            
+            opt="--entrypoint $entrypoint"
+            if [ -z "$entrypoint" ]; then 
+              opt=""
+              docker run --rm  ${image}  ${cmd}
+            else
+              docker run --rm $opt -v ./test:/test ${image} /test/run.sh
+            fi
+            
+            # echo "docker run --rm -i $opt ${image}  $cmd"
+            # docker run --rm -i $opt  ${image}  ${cmd}
 
   
       - name: Upload artifact

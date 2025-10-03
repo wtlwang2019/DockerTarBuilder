@@ -7,6 +7,10 @@ on:
         description: 'docker image的tag'
         required: true
         default: 'ghcr.io/wtlwang2019/llamacpp:arm64'
+      entrypoint:
+        description: 'docker image运行的entrypoint,例如/bin/bash'
+        required: false
+        default: ''
       cmd:
         description: '运行镜像的命令, 例如/bin/bash'
         required: true
@@ -27,12 +31,15 @@ jobs:
         env: 
           image: ${{ inputs.image_tag }}
           cmd: ${{ inputs.cmd }}
+          entrypoint: ${{ inputs.entrypoint }}
         run: |
             pwd
             ls
+            opt = "--entrypoint $entrypoint"
+            if [ -z $entrypoint ]; then opt='' ; fi
             docker pull $image
             docker images -a
-            docker run --rm -i  ${image}  $cmd
+            docker run --rm -i $opt  ${image}  $cmd
 
   
       - name: Upload artifact

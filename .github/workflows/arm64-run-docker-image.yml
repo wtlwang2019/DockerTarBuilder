@@ -6,7 +6,7 @@ on:
       image_tag:
         description: 'docker image的tag'
         required: true
-        default: 'ghcr.io/wtlwang2019/llamacpp:arm64'
+        default: 'ghcr.io/wtlwang2019/llama_cpp:arm64'
       entrypoint:
         description: 'docker image运行的entrypoint,例如/bin/bash'
         required: false

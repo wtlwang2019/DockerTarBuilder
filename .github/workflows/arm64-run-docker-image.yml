@@ -35,7 +35,7 @@ jobs:
         run: |
             pwd
             ls
-            opt = "--entrypoint $entrypoint"
+            opt="--entrypoint $entrypoint"
             if [ -z $entrypoint ]; then opt='' ; fi
             docker pull $image
             docker images -a

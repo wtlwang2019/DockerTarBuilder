@@ -43,8 +43,10 @@ jobs:
             if [ -z "$entrypoint" ]; then 
               opt=""
               docker run --rm  ${image}  ${cmd}
-            else
+            elif [ "$cmd" = "-h" ]; then
               docker run --rm $opt -v ./test:/test ${image} /test/run.sh
+            else
+              docker run --rm $opt ${image} -c "$cmd"
             fi
             
             # echo "docker run --rm -i $opt ${image}  $cmd"

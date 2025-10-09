@@ -1,13 +1,13 @@
-ls -l 
-pwd
+echo "ls -l" && ls -l 
+echo "pwd" && pwd
 env
 ls -l /
 echo "ls /app"
 ls -l /app  || echo 0
 ls -l /mnt
 
-ls -l /bin
-ls -l /usr/bin
+echo "ls -l /bin" && ls -l /bin
+echo "ls -l /usr/bin" && ls -l /usr/bin
 ls -l /usr/local/bin
 
 cat /start.sh || echo 0

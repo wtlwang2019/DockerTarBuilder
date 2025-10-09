@@ -6,6 +6,8 @@ echo "ls /app"
 ls -l /app  || echo 0
 ls -l /mnt
 
+echo "ll /models" && ls -l /models || echo 0
+
 echo "ls -l /bin" && ls -l /bin
 echo "ls -l /usr/bin" && ls -l /usr/bin
 ls -l /usr/local/bin

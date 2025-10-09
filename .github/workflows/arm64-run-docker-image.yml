@@ -12,7 +12,7 @@ on:
         required: false
         default: ''
       cmd:
-        description: '运行镜像的命令, 例如/bin/bash'
+        description: '运行镜像的命令, 例如ls -l; null表示使用默认cmd'
         required: true
         default: '-h'      
       
@@ -41,8 +41,11 @@ jobs:
             
             opt="--entrypoint $entrypoint"
             if [ -z "$entrypoint" ]; then 
-              opt=""
-              docker run --rm  ${image}  ${cmd}
+              if [ "$cmd" = "null" ]; then
+                docker run --rm ${image}
+              else
+                docker run --rm  ${image}  ${cmd}
+              fi
             elif [ "$cmd" = "-h" ]; then
               docker run --rm $opt -v ./test:/test ${image} /test/run.sh
             else

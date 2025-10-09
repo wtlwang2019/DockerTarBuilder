@@ -10,11 +10,11 @@ on:
       dockerfile_path:
         description: 'Dokerfile 所属的项目路径'
         required: true
-        default: 'zookeeper/Dockerfile'  
+        default: 'llama_cpp/Dockerfile'  
       image_tag:
         description: 'Docker image的tag: project:version'
         required: true   
-        default: 'zookeeper:arm64'
+        default: 'llama_cpp:arm64'
   # schedule:
   #   # Rebuild daily rather than on every push because it is expensive
   #   - cron: '12 4 * * *'

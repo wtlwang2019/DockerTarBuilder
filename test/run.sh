@@ -2,6 +2,8 @@ ls -l
 pwd
 env
 ls -l /
+echo "ls /app"
+ls -l /app  || echo 0
 ls -l /mnt
 
 ls -l /bin

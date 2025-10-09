@@ -5,7 +5,7 @@ ls -l /
 echo "ls /app"
 ls -l /app  || echo 0
 ls -l /mnt
-
+ls -l /afs || echo 0
 echo "ll /models" && ls -l /models || echo 0
 
 echo "ls -l /bin" && ls -l /bin

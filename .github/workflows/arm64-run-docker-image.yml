@@ -38,7 +38,7 @@ jobs:
             cmd="${{ inputs.cmd }}"
             docker pull $image
             docker images -a
-            
+            docker inspect $image
             opt="--entrypoint $entrypoint"
             if [ -z "$entrypoint" ]; then 
               if [ "$cmd" = "null" ]; then

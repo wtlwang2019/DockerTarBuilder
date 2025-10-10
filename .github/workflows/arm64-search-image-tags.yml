@@ -43,14 +43,14 @@ jobs:
           # ls -l
           cd arm64
           python get_arm64_image_tags.py
-          tar -czvf tags.tar.gz *.txt *.json
-          rm *.txt
-          cp tags.tar.gz ../
+          # tar -czvf tags.tar.gz *.txt *.json
+          rm *.txt || echo 0
+          cp *.json ../
 
       - name: List generated files (debug step)
         run: |
-          echo "Preparing docker images tag (.gz) files:"
-          find $GITHUB_WORKSPACE -name "*.gz"
+          echo "Preparing docker images json (.json) files:"
+          find $GITHUB_WORKSPACE -name "*.json"
           release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
           echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
 
@@ -74,7 +74,7 @@ jobs:
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: DockerTarBuilder-ARM64
-          files: ${{ github.workspace }}/*.gz
+          files: ${{ github.workspace }}/*.json
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

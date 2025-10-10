@@ -1,0 +1,83 @@
+name: ARM64-Search-Image-tags
+
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: '请填写docker镜像的namespace'
+        required: true
+        default: 'library'    
+      docker_images:
+        description: '请填写docker镜像名称,多个用英文逗号分开'
+        required: true
+        default: 'alpine,nginx,busybox'
+
+jobs:
+  search_and_package:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Search DockerHub Images tags
+        run: |
+          df -h
+          images="${{ github.event.inputs.docker_images }}"
+          namespace="${{ github.event.inputs.namespace}}"
+          # page="${{ inputs.page }}"
+          # pagesize="${{ inputs.page_size }}"
+          # IFS=',' read -r -a image_array <<< "$images"
+          # success=false
+          # for image in "${image_array[@]}"; do
+          #   if curl -f -o "${image}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=${page}&page_size=${pagesize}"; then
+          #     echo "Downloaded tags for $image"
+          #     success=true
+          #   else
+          #     echo "Failed to fetch tags for $image" >&2
+          #   fi
+          # done
+          # if ! $success; then
+          #   echo "No tags files were downloaded. Exiting." >&2
+          #   exit 2
+          # fi
+          # ls -l
+          tar -czvf tags.tar.gz *.txt *.json
+          rm *.txt
+          # for image in "${image_array[@]}"; do
+          #   curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 
+          # done
+          # ls -l
+          # tar -czvf tags.tar.gz *.txt
+          #gzip -c *.tags.txt > "tags.txt.gz"
+
+      - name: List generated files (debug step)
+        run: |
+          echo "Preparing docker images list (.txt) files:"
+          find $GITHUB_WORKSPACE -name "*.gz"
+          release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
+          echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@master
+        with:
+          tag_name: DockerTarBuilder-AMD64
+          name: ${{ env.RELEASE_NAME }} for x86-64
+          body: |
+            [![Github](https://img.shields.io/badge/RELEASE:DockerTarBuilder-123456?logo=github&logoColor=fff&labelColor=green&style=for-the-badge)](https://www.bilibili.com/video/BV1EZ421M7mL) [![Github](https://img.shields.io/badge/国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1)
+            ### How to use? For example
+            `docker load -i alpine_latest.tar.gz `
+            ### Video teaching
+            [![Bilibili](https://img.shields.io/badge/Bilibili-123456?logo=bilibili&logoColor=fff&labelColor=fb7299)](https://www.bilibili.com/video/BV1yyq6YREdF)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload DockerHub tags.txt.gz as release assets
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: DockerTarBuilder-AMD64
+          files: ${{ github.workspace }}/*.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

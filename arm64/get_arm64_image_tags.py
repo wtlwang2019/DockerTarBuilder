@@ -58,7 +58,7 @@ def get_arm64_images(image_id: str):
     res, next_url = parse_dockerhub_tag_json_result(download_url_content(target_url, save_path))
     arm64_images_list.extend(res)
     while len(arm64_images_list) < 20 and next_url:
-        res, next_url = parse_dockerhub_tag_json_result(download_url_content(target_url, save_path))
+        res, next_url = parse_dockerhub_tag_json_result(download_url_content(next_url, save_path))
         arm64_images_list.extend(res)
     with open(save_path, "w", encoding="utf-8") as f:
         f.write(json.dumps(arm64_images_list))

@@ -41,18 +41,15 @@ jobs:
           #   exit 2
           # fi
           # ls -l
+          cd arm64
+          python get_arm64_image_tags.py
           tar -czvf tags.tar.gz *.txt *.json
           rm *.txt
-          # for image in "${image_array[@]}"; do
-          #   curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 
-          # done
-          # ls -l
-          # tar -czvf tags.tar.gz *.txt
-          #gzip -c *.tags.txt > "tags.txt.gz"
+          cp tags.tar.gz ../
 
       - name: List generated files (debug step)
         run: |
-          echo "Preparing docker images list (.txt) files:"
+          echo "Preparing docker images tag (.gz) files:"
           find $GITHUB_WORKSPACE -name "*.gz"
           release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
           echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV
@@ -60,8 +57,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@master
         with:
-          tag_name: DockerTarBuilder-AMD64
-          name: ${{ env.RELEASE_NAME }} for x86-64
+          tag_name: DockerTarBuilder-ARM64
+          name: ${{ env.RELEASE_NAME }} for arm64
           body: |
             [![Github](https://img.shields.io/badge/RELEASE:DockerTarBuilder-123456?logo=github&logoColor=fff&labelColor=green&style=for-the-badge)](https://www.bilibili.com/video/BV1EZ421M7mL) [![Github](https://img.shields.io/badge/国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1)
             ### How to use? For example
@@ -73,10 +70,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload DockerHub tags.txt.gz as release assets
+      - name: Upload DockerHub images.search.gz as release assets
         uses: softprops/action-gh-release@v2.1.0
         with:
-          tag_name: DockerTarBuilder-AMD64
+          tag_name: DockerTarBuilder-ARM64
           files: ${{ github.workspace }}/*.gz
           token: ${{ secrets.GITHUB_TOKEN }}
         env:

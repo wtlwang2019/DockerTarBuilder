@@ -57,7 +57,7 @@ jobs:
 
       - name: List generated files (debug step)
         run: |
-          echo "Preparing docker images list (.txt) files:"
+          echo "Preparing release (.gz) files:"
           find $GITHUB_WORKSPACE -name "*.gz"
           release_name=$(TZ="Asia/Shanghai" date +'%Y-%m-%d %H:%M Build')
           echo "RELEASE_NAME=$release_name" >> $GITHUB_ENV

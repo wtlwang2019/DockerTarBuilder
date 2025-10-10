@@ -67,7 +67,14 @@ def get_arm64_images(image_id: str):
 if __name__ == "__main__":
     # 目标 URL（Docker Hub 仓库标签接口）
     # target_url = "https://hf-mirror.com/Qwen/Qwen2.5-0.5B-Instruct-GGUF/tree/main"
-    image_id = 'yusiwen/llama.cpp'
+    # image_id = 'yusiwen/llama.cpp'
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("image_id", type=str, help="docker的镜像id, 例如：yusiwen/llama.cpp")
+    args = parser.parse_args()
+    image_id = args.image_id
+    if '/' not in image_id:
+        image_id = 'library/'+image_id    
 
     # 本地保存路径（如当前目录下的 docker_llama_tags.json）
     get_arm64_images(image_id)

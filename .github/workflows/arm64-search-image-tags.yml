@@ -2,15 +2,11 @@ name: ARM64-Search-Image-tags
 
 on:
   workflow_dispatch:
-    inputs:
-      namespace:
-        description: '请填写docker镜像的namespace'
-        required: true
-        default: 'library'    
+    inputs:  
       docker_images:
         description: '请填写docker镜像名称,多个用英文逗号分开'
         required: true
-        default: 'alpine,nginx,busybox'
+        default: 'alpine,yusiwen/llama.cpp,busybox'
 
 jobs:
   search_and_package:
@@ -22,27 +18,26 @@ jobs:
       - name: Search DockerHub Images tags
         run: |
           df -h
-          images="${{ github.event.inputs.docker_images }}"
-          namespace="${{ github.event.inputs.namespace}}"
-          # page="${{ inputs.page }}"
-          # pagesize="${{ inputs.page_size }}"
-          # IFS=',' read -r -a image_array <<< "$images"
-          # success=false
-          # for image in "${image_array[@]}"; do
-          #   if curl -f -o "${image}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=${page}&page_size=${pagesize}"; then
-          #     echo "Downloaded tags for $image"
-          #     success=true
-          #   else
-          #     echo "Failed to fetch tags for $image" >&2
-          #   fi
-          # done
-          # if ! $success; then
-          #   echo "No tags files were downloaded. Exiting." >&2
-          #   exit 2
-          # fi
-          # ls -l
           cd arm64
-          python get_arm64_image_tags.py
+          images="${{ inputs.docker_images }}"
+
+          IFS=',' read -r -a image_array <<< "$images"
+          success=false
+          for image in "${image_array[@]}"; do
+            if python get_arm64_image_tags.py  "${image}" ; then
+              echo "Downloaded tags for $image"
+              success=true
+            else
+              echo "Failed to fetch tags for $image" >&2
+            fi
+          done
+          if ! $success; then
+            echo "No tags files were downloaded. Exiting." >&2
+            exit 2
+          fi
+          ls -l
+
+          # python get_arm64_image_tags.py
           # tar -czvf tags.tar.gz *.txt *.json
           rm *.txt || echo 0
           cp *.json ../

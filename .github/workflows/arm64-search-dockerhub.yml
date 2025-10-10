@@ -32,9 +32,10 @@ jobs:
           IFS=',' read -r -a image_array <<< "$images"
           success=false
           for image in "${image_array[@]}"; do
-            if curl -f -o "${image}.search.txt" "https://hub.docker.com/search.data?q=${image}&type=image&architecture=${arch}&operating_system=linux&_routes=root%2Croutes%2F_layout.search"; then
+            if curl -f -o "${image}.search.txt" "https://hub.docker.com/search.data?q=${image}&type=image&architecture=${arch}&operating_system=linux&page_size=50&_routes=routes%2F_layout.search"; then
               echo "Downloaded tags for $image"
               success=true
+              curl -f -o "${image}.pull_count.search.txt" "https://hub.docker.com/search.data?q=${image}&type=image&architecture=${arch}&operating_system=linux&page_size=50&sort=pull_count&order=desc&_routes=routes%2F_layout.search"
             else
               echo "Failed to fetch tags for $image" >&2
             fi
@@ -44,7 +45,8 @@ jobs:
             exit 2
           fi
           ls -l
-          tar -czvf images.search.gz *.txt
+          python parse_dockerhub_json.py "${image}.search.txt"
+          tar -czvf images.search.gz *.txt *.csv *.json
           rm *.txt
           # for image in "${image_array[@]}"; do
           #   curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 

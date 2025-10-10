@@ -178,7 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("input_path", type=str, help="原始文件的路径")
     args = parser.parse_args()
     INPUT_PATH =  args.input_path # 原始附件路径
-    OUTPUT_PREFIX = "images"   # 输出文件前缀
+    OUTPUT_PREFIX = args.input_path.strip(".txt")+"_images"   # 输出文件前缀
     
     try:
         # 步骤1：加载并解析原始键值序号序列

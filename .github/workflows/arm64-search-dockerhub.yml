@@ -26,6 +26,7 @@ jobs:
       - name: Search DockerHub Images tags
         run: |
           df -h
+          pwd && ls
           images="${{ github.event.inputs.docker_images }}"
           arch="${{ inputs.arch}}"
           pagesize="${{ inputs.page_size }}"

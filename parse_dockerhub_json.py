@@ -2,6 +2,7 @@ import json
 import csv
 from typing import List, Dict, Union
 from datetime import datetime
+import argparse
 
 def parse_key_value_sequence(seq: List, value_idx: int):
     """
@@ -173,8 +174,11 @@ def print_console_table(image_info: List[Dict[str, str]]) -> None:
 
 if __name__ == "__main__":
     # 配置参数
-    INPUT_PATH = "llama.cpp.search.txt"  # 原始附件路径
-    OUTPUT_PREFIX = "llama_cpp_images"   # 输出文件前缀
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input_path", type=str, help="原始文件的路径")
+    args = parser.parse_args()
+    INPUT_PATH =  args.input_path # 原始附件路径
+    OUTPUT_PREFIX = "images"   # 输出文件前缀
     
     try:
         # 步骤1：加载并解析原始键值序号序列

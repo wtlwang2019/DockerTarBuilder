@@ -56,9 +56,9 @@ jobs:
             # docker run --rm -i $opt  ${image}  ${cmd}
 
   
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: my-artifact
-      #     path: ${{ github.workspace }}/*.tar.gz
-      #     retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: ${{ github.workspace }}/test/*.{log,txt}
+          retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天

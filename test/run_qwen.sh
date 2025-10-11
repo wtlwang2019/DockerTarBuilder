@@ -4,6 +4,9 @@ USER=wtl
 set +e   # 关闭错误退出（默认状态）
 pwd
 ls -l
+if ls /test; then
+wget https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf
+fi
 filePath=`pwd`
 ls -l /
 ls -l /mnt

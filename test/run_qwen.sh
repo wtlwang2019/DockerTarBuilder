@@ -43,34 +43,39 @@ export GGML_DISABLE_FMA=1
 ps_count=0
 ## samueltallet
 ls /opt && ls /opt/llama.cpp  && cd /opt/llama.cpp
-/opt/llama.cpp/llama-server -h
-#/opt/llama.cpp/llama-server -m "$filePath/qwen2.5-0.5b-instruct-q4_k_m.gguf" --host 0.0.0.0 --port 8080 --no-webui  &
-ls "$filePath/Qwen3-0.6B-Q4_K_M.gguf" && /opt/llama.cpp/llama-server -m "$filePath/Qwen3-0.6B-Q4_K_M.gguf" --host 0.0.0.0 --port 8080 --no-webui  > "$job_path/qwen3_server.log" 2>&1 &
-sleep 1
+if /opt/llama.cpp/llama-server -h; then
+    ls "$filePath/Qwen3-0.6B-Q4_K_M.gguf" && /opt/llama.cpp/llama-server -m "$filePath/Qwen3-0.6B-Q4_K_M.gguf" --host 0.0.0.0 --port 8080 --no-webui  & # > "$job_path/qwen3_server.log" 2>&1 &
+    sleep 1
+    ps_count=$(ps aux | grep "llama-server" |grep -v grep | wc -l)
+    echo "ps_count: $ps_count"
+    if [ "$ps_count" -eq 0 ]; then
+        nohup /opt/llama.cpp/llama-server -m "$filePath/qwen2.5-0.5b-instruct-q4_k_m.gguf" --host 0.0.0.0 --port 8080 --no-webui  > "$job_path/qwen2.5_server.log" 2>&1 &
+    fi
+    sleep 1
+fi
+# 如果服务已启动
 ps_count=$(ps aux | grep "llama-server" |grep -v grep | wc -l)
 echo "ps_count: $ps_count"
-if [ "$ps_count" -eq 0 ]; then 
-    nohup /opt/llama.cpp/llama-server -m "$filePath/qwen2.5-0.5b-instruct-q4_k_m.gguf" --host 0.0.0.0 --port 8080 --no-webui  > "$job_path/qwen2.5_server.log" 2>&1 & 
-fi
-
-if ls /opt/llama.cpp; then 
-    sleep 10
+if [ "$ps_count" -gt 0 ]; then
+    sleep 30
     wget --help
-    while ! wget -q -O - http://127.0.0.1:8080/health; do
-    
+    for i in $(seq 30)
+    do
+        wget -q -O - http://127.0.0.1:8080/health
         # 检查上一个命令的退出码，判断是否为 503 (服务器错误)
         exit_code=$?
-        if [ $exit_code -eq 8 ]; then
+        if [ $exit_code -eq 0 ]; then
+            break
+        elif [ $exit_code -eq 8 ]; then
             echo "[$(date)] 服务器返回错误 (可能是 503)，下载失败。"
         else
             echo "[$(date)] 发生未知错误 (退出码: $exit_code)，下载失败。"
         fi
-
-        echo "将在 10 秒后重试..."
-        sleep 10
+        echo "将在 30 秒后重试..."
+        sleep 30
     done
+    wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1800 http://127.0.0.1:8080/v1/chat/completions
 fi
-ls /opt/llama.cpp  && wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1200 http://127.0.0.1:8080/v1/chat/completions
 
 ## yusiwen
 ls /llama.cpp && cd /llama.cpp || echo 0

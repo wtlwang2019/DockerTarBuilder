@@ -40,6 +40,7 @@ jobs:
             docker images -a
             docker inspect $image
             opt="--entrypoint $entrypoint"
+            # 使用镜像自带的entrypoint，不挂在/test目录
             if [ -z "$entrypoint" ]; then 
               if [ "$cmd" = "null" ]; then
                 docker run --rm ${image}
@@ -49,7 +50,7 @@ jobs:
             elif [ "$cmd" = "-h" ]; then
               docker run --rm $opt -v ./test:/test ${image} /test/run.sh
             else
-              docker run --rm $opt ${image} -c "$cmd"
+              docker run --rm $opt -v ./test:/test ${image} -c "$cmd"
             fi
             
             # echo "docker run --rm -i $opt ${image}  $cmd"

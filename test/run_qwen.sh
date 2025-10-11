@@ -101,25 +101,27 @@ if ls /llm; then
 fi
 
 
-### 有curl命令的镜像，可以执行curl
+### 最后一部分测试llama-server的推理
+# llama-server 没启动的话，直接退出
+sleep 3
+ps_count=$(ps aux | grep "llama-server" |grep -v grep | wc -l)
+echo "ps_count: $ps_count"
+if [ "$ps_count" -eq 0 ]; then 
+    exit 1
+fi
+
 curl http://127.0.0.1:8080/health
 if which curl; then
-    while ! wget -q -O - http://127.0.0.1:8080/health; do
-    
-        # 检查上一个命令的退出码，判断是否为 503 (服务器错误)
-        exit_code=$?
-        if [ $exit_code -eq 8 ]; then
-            echo "[$(date)] 服务器返回错误 (可能是 503)，下载失败。"
+    for i in $(seq 10)
+    do
+        if curl http://127.0.0.1:8080/health; then
+            break
         else
-            echo "[$(date)] 发生未知错误 (退出码: $exit_code)，下载失败。"
+            sleep 30
         fi
-
-        echo "将在 10 秒后重试..."
-        sleep 10
     done
     curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Hello"}]}' -m 1200
-    sleep 1
-
+    sleep 5
     curl -o "$job_path/result.json" http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Who are you? can you speak chinese?"}]}' -m 1200
 fi
 

@@ -57,7 +57,7 @@ fi
 ps_count=$(ps aux | grep "llama-server" |grep -v grep | wc -l)
 echo "ps_count: $ps_count"
 if [ "$ps_count" -gt 0 ]; then
-    sleep 30
+    sleep 3
     wget --help
     for i in $(seq 30)
     do
@@ -72,7 +72,7 @@ if [ "$ps_count" -gt 0 ]; then
             echo "[$(date)] 发生未知错误 (退出码: $exit_code)，下载失败。"
         fi
         echo "将在 30 秒后重试..."
-        sleep 30
+        sleep 10
     done
     wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1800 http://127.0.0.1:8080/v1/chat/completions
 fi

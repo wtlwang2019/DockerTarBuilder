@@ -34,6 +34,9 @@ ls -l
 echo "test" > pytorch_output/just_test.txt
 
 ls -l / > pytorch_output/dir.txt
+
+# 修改job_path, 此后所有输出到job_path的内容，都会在pytorch_output目录下
+job_path="$job_path/pytorch_output"
 echo "查看/bin目录下的执行文件"
 ls -l /bin && ls -l /usr/bin
 
@@ -46,7 +49,7 @@ ps_count=0
 ## samueltallet
 ls /opt && ls /opt/llama.cpp  && cd /opt/llama.cpp
 if /opt/llama.cpp/llama-server -h; then
-    ls "$filePath/Qwen3-0.6B-Q4_K_M.gguf" && /opt/llama.cpp/llama-server -m "$filePath/Qwen3-0.6B-Q4_K_M.gguf" --host 0.0.0.0 --port 8080 --no-webui  & # > "$job_path/qwen3_server.log" 2>&1 &
+    ls "$filePath/Qwen3-0.6B-Q4_K_M.gguf" && /opt/llama.cpp/llama-server -m "$filePath/Qwen3-0.6B-Q4_K_M.gguf" --host 0.0.0.0 --port 8080 --no-webui > "$job_path/qwen3_server.log" 2>&1 &
     sleep 1
     ps_count=$(ps aux | grep "llama-server" |grep -v grep | wc -l)
     echo "ps_count: $ps_count"
@@ -76,7 +79,7 @@ if [ "$ps_count" -gt 0 ]; then
         echo "将在 30 秒后重试..."
         sleep 10
     done
-    wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1800 http://127.0.0.1:8080/v1/chat/completions
+    wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1800 http://127.0.0.1:8080/v1/chat/completions | tee "$job_path/server_response.log"
 fi
 
 ## yusiwen

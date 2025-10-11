@@ -6,7 +6,8 @@ id
 pwd
 ls -l
 if ls /test; then
-wget https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf
+    wget https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf
+    ls -l /test
 fi
 filePath=`pwd`
 ls -l /

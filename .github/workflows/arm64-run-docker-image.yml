@@ -34,6 +34,7 @@ jobs:
           entrypoint: ${{ inputs.entrypoint }}
         run: |
             pwd
+            id
             ls
             cmd="${{ inputs.cmd }}"
             docker pull $image

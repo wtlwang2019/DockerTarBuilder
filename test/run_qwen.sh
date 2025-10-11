@@ -54,7 +54,7 @@ if [ "$ps_count" -eq 0 ]; then
 fi
 
 if ls /opt/llama.cpp; then 
-    sleep 30
+    sleep 10
     wget --help
     while ! wget -q -O - http://127.0.0.1:8080/health; do
     
@@ -66,8 +66,8 @@ if ls /opt/llama.cpp; then
             echo "[$(date)] 发生未知错误 (退出码: $exit_code)，下载失败。"
         fi
 
-        echo "将在 30 秒后重试..."
-        sleep 30
+        echo "将在 10 秒后重试..."
+        sleep 10
     done
 fi
 ls /opt/llama.cpp  && wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1200 http://127.0.0.1:8080/v1/chat/completions
@@ -100,14 +100,27 @@ if ls /llm; then
     /llm/llama-cli -m /llm/qwen2.5-0.5b-instruct-q4_k_m.gguf -p 'what is your name?'
 fi
 
-sleep 30
 
+### 有curl命令的镜像，可以执行curl
 curl http://127.0.0.1:8080/health
 if which curl; then
+    while ! wget -q -O - http://127.0.0.1:8080/health; do
+    
+        # 检查上一个命令的退出码，判断是否为 503 (服务器错误)
+        exit_code=$?
+        if [ $exit_code -eq 8 ]; then
+            echo "[$(date)] 服务器返回错误 (可能是 503)，下载失败。"
+        else
+            echo "[$(date)] 发生未知错误 (退出码: $exit_code)，下载失败。"
+        fi
+
+        echo "将在 10 秒后重试..."
+        sleep 10
+    done
     curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Hello"}]}' -m 1200
-    sleep 5
+    sleep 1
 
     curl -o "$job_path/result.json" http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Who are you? can you speak chinese?"}]}' -m 1200
 fi
 
-sleep 30
+sleep 3

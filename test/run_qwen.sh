@@ -2,6 +2,7 @@
 
 USER=wtl
 set +e   # 关闭错误退出（默认状态）
+id
 pwd
 ls -l
 if ls /test; then

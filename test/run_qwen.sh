@@ -19,10 +19,21 @@ while [ $# -gt 0 ]; do
                 exit 1
             fi
             ;;
+        -n)
+            # 检查 -t 后是否有参数
+            if [ -n "$2" ]; then
+                n="$2"  # 将下一个参数赋值给t
+                shift 2  # 跳过 -t 和其值，指针移到下下个参数
+            else
+                echo -e "\033[31m错误：-n 参数后缺少值！\033[0m"
+                exit 1
+            fi
+            ;;            
         # 可添加其他参数的处理（如 -h 显示帮助）
         -h)
             echo "用法：$0 [-t <值>] [其他参数...]"
             echo "  -t <值>   环境变量LLAMA_ARG_THREADS的值"
+            echo "  -n <值>   环境变量LLAMA_ARG_N_PREDICT的值"            
             echo "  -h        显示帮助信息"
             exit 0
             ;;
@@ -42,6 +53,9 @@ else
     echo -e "\033[33m未传入 -t 参数，t 为空\033[0m"
 fi
 
+if [ -n "$n" ]; then
+    export LLAMA_ARG_N_PREDICT="$n"
+fi    
 
 ## 1.准备必要参数
 if [ -z "$USER" ]; then

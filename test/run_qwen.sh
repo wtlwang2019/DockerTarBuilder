@@ -69,6 +69,7 @@ fi
 set +e   # 关闭错误退出（默认状态）
 id
 pwd
+echo "查看环境变量" && env
 ls -l
 if ls /test; then
     # github 环境，下载qwen模型文件
@@ -78,17 +79,13 @@ fi
 filePath=`pwd`
 ls -l /
 ls -l /mnt
+
 ls -l /mnt/publish-data/$USER
-
-
 echo "查看jobs目录"
 ls -l -t /mnt/publish-data/$USER/jobs
-echo "查看环境变量" && env
-
 echo "查看最近一个jobs下的文件"
 job_path="/test"
 ls -l -t $job_path
-
 cd "$job_path"
 ls -l
 echo "检测硬件指令集"
@@ -98,7 +95,6 @@ echo "test111" > just_test111.txt
 mkdir pytorch_output
 ls -l
 echo "test" > pytorch_output/just_test.txt
-
 ls -l / > pytorch_output/dir.txt
 
 # 修改job_path, 此后所有输出到job_path的内容，都会在pytorch_output目录下
@@ -114,6 +110,7 @@ export GGML_DISABLE_FMA=1
 export LLAMA_LOG_TIMESTAMPS=1  #打开日志时间戳
 export LLAMA_ARG_HOST='0.0.0.0'
 ps_count=0
+echo "查看环境变量" && env
 ## samueltallet
 ls /opt && ls /opt/llama.cpp  && cd /opt/llama.cpp
 if /opt/llama.cpp/llama-server -h; then
@@ -147,7 +144,9 @@ if [ "$ps_count" -gt 0 ]; then
         echo "将在 30 秒后重试..."
         sleep 10
     done
-    wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"tell a joke\"}]}" --header "Content-Type: application/json"  -T 1800 http://127.0.0.1:8080/v1/chat/completions | tee "$job_path/server_response.log"
+    for prompt in "hello" "tell a joke" "who are you?" ; do
+        wget -O -  --post-data "{\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}]}" --header "Content-Type: application/json"  -T 1800 http://127.0.0.1:8080/v1/chat/completions | tee -a "$job_path/server_response.log"
+    done
 fi
 
 ## yusiwen

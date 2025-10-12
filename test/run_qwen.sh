@@ -1,6 +1,8 @@
 #!/bin/env bash
 
-USER=wtl
+if [ -z "$USER" ]; then
+    USER=wtl
+fi
 set +e   # 关闭错误退出（默认状态）
 id
 pwd

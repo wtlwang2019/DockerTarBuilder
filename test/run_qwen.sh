@@ -30,10 +30,15 @@ while [ $# -gt 0 ]; do
             fi
             ;;            
         # 可添加其他参数的处理（如 -h 显示帮助）
+        --no-think)
+            export LLAMA_ARG_THINK_BUDGET=0
+            shift 1
+            ;;
         -h)
             echo "用法：$0 [-t <值>] [其他参数...]"
             echo "  -t <值>   环境变量LLAMA_ARG_THREADS的值"
-            echo "  -n <值>   环境变量LLAMA_ARG_N_PREDICT的值"            
+            echo "  -n <值>   环境变量LLAMA_ARG_N_PREDICT的值"     
+            echo " --no-think 关闭深度思考"
             echo "  -h        显示帮助信息"
             exit 0
             ;;

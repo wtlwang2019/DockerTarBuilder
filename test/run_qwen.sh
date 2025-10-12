@@ -112,6 +112,7 @@ export GGML_DISABLE_AVX=1
 export GGML_DISABLE_AVX2=1
 export GGML_DISABLE_FMA=1
 export LLAMA_LOG_TIMESTAMPS=1  #打开日志时间戳
+export LLAMA_ARG_HOST='0.0.0.0'
 ps_count=0
 ## samueltallet
 ls /opt && ls /opt/llama.cpp  && cd /opt/llama.cpp

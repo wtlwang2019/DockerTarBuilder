@@ -129,6 +129,7 @@ echo "ps_count: $ps_count"
 if [ "$ps_count" -gt 0 ]; then
     sleep 3
     wget --help
+    top -b -n 10 > "$job_path/top.txt" & 
     for i in $(seq 30)
     do
         wget -q -O - http://127.0.0.1:8080/health

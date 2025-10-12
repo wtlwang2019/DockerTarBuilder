@@ -106,6 +106,7 @@ set +e          # 关闭错误退出（默认状态）
 export GGML_DISABLE_AVX=1
 export GGML_DISABLE_AVX2=1
 export GGML_DISABLE_FMA=1
+export LLAMA_LOG_TIMESTAMPS=1  #打开日志时间戳
 ps_count=0
 ## samueltallet
 ls /opt && ls /opt/llama.cpp  && cd /opt/llama.cpp

@@ -1,5 +1,49 @@
 #!/bin/env bash
 
+## 0.读取入参
+# 功能：检查入参中是否包含 -t，并获取其后续值
+# 用法：./run_qwen.sh [-t <值>] [其他参数...]
+
+t=""  # 初始化变量t
+# 循环处理所有参数
+while [ $# -gt 0 ]; do
+    case "$1" in
+        # 匹配 -t 参数
+        -t)
+            # 检查 -t 后是否有参数
+            if [ -n "$2" ]; then
+                t="$2"  # 将下一个参数赋值给t
+                shift 2  # 跳过 -t 和其值，指针移到下下个参数
+            else
+                echo -e "\033[31m错误：-t 参数后缺少值！\033[0m"
+                exit 1
+            fi
+            ;;
+        # 可添加其他参数的处理（如 -h 显示帮助）
+        -h)
+            echo "用法：$0 [-t <值>] [其他参数...]"
+            echo "  -t <值>   环境变量LLAMA_ARG_THREADS的值"
+            echo "  -h        显示帮助信息"
+            exit 0
+            ;;
+        # 处理未定义的参数（可根据需求选择忽略或报错）
+        *)
+            echo -e "\033[33m提示：忽略未知参数 '$1'\033[0m"
+            shift 1  # 跳过当前未知参数
+            ;;
+    esac
+done
+
+# 输出结果
+if [ -n "$t" ]; then
+    echo -e "\033[32m成功获取 -t 参数，t = $t\033[0m"
+    export LLAMA_ARG_THREADS="$t"
+else
+    echo -e "\033[33m未传入 -t 参数，t 为空\033[0m"
+fi
+
+
+## 1.准备必要参数
 if [ -z "$USER" ]; then
     USER=wtl
 fi

@@ -12,7 +12,7 @@ while [ $# -gt 0 ]; do
         -t)
             # 检查 -t 后是否有参数
             if [ -n "$2" ]; then
-                t="$2"  # 将下一个参数赋值给t
+                export LLAMA_ARG_THREADS="$2"
                 shift 2  # 跳过 -t 和其值，指针移到下下个参数
             else
                 echo -e "\033[31m错误：-t 参数后缺少值！\033[0m"
@@ -22,23 +22,40 @@ while [ $# -gt 0 ]; do
         -n)
             # 检查 -n 后是否有参数
             if [ -n "$2" ]; then
-                n="$2"  # 将下一个参数赋值给t
-                shift 2  # 跳过 -t 和其值，指针移到下下个参数
+                export LLAMA_ARG_N_PREDICT="$2"
+                shift 2  #
             else
                 echo -e "\033[31m错误：-n 参数后缺少值！\033[0m"
                 exit 1
             fi
-            ;;            
-        # 可添加其他参数的处理（如 -h 显示帮助）
+            ;;
+        -ub)
+            if [ -n "$2" ]; then
+                export LLAMA_ARG_UBATCH="$2"
+                shift 2  #
+            else
+                echo -e "\033[31m错误：-n 参数后缺少值！\033[0m"
+                exit 1
+            fi
+            ;;
         --no-think)
             export LLAMA_ARG_THINK_BUDGET=0
             shift 1
             ;;
-        # 严格模式，遇到报错就退出    
         --strict)
             set -e
             shift 1
             ;;
+        --server-param)
+            if [ -n "$2" ]; then
+                server_param="$2"
+                shift 2  #
+            else
+                echo -e "\033[31m错误：-n 参数后缺少值！\033[0m"
+                exit 1
+            fi
+            ;;
+        # 可添加其他参数的处理（如 -h 显示帮助）
         -h)
             echo "用法：$0 [-t <值>] [其他参数...]"
             echo "  -t <值>   环境变量LLAMA_ARG_THREADS的值"
@@ -48,6 +65,19 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         # 匹配带=号的参数
+        --*=*)
+            # 1. 移除前缀 '--'
+            key_value="${1#--}"
+            # echo "移除 '--' 后: $key_value"
+            # 2. 分割成 key 和 value
+            key="${key_value%%=*}"   # 从右向左删除第一个 '=' 及其右边的所有内容
+            value="${key_value#*=}"  # 从左向右删除第一个 '=' 及其左边的所有内容
+            echo "发现参数: key='$key', value='$value'"
+            # 方式1: 使用 declare (推荐，更安全)
+            declare "$key"="$value"
+            # export "$key"  暂时不导出环境变量
+            shift 1
+            ;;
         *=*)
             key="${1%%=*}"
             value="${1#*=}"
@@ -64,17 +94,6 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-# 输出结果
-if [ -n "$t" ]; then
-    echo -e "\033[32m成功获取 -t 参数，t = $t\033[0m"
-    export LLAMA_ARG_THREADS="$t"
-else
-    echo -e "\033[33m未传入 -t 参数，t 为空\033[0m"
-fi
-
-if [ -n "$n" ]; then
-    export LLAMA_ARG_N_PREDICT="$n"
-fi    
 
 ## 1.准备必要参数
 if [ -z "$USER" ]; then
@@ -128,12 +147,12 @@ echo "查看环境变量" && env
 ## samueltallet
 ls /opt && ls /opt/llama.cpp  && cd /opt/llama.cpp
 if /opt/llama.cpp/llama-server -h; then
-    ls "$filePath/Qwen3-0.6B-Q4_K_M.gguf" && /opt/llama.cpp/llama-server -m "$filePath/Qwen3-0.6B-Q4_K_M.gguf" --host 0.0.0.0 --port 8080 --no-webui > "$job_path/qwen3_server.log" 2>&1 &
+    ls "$filePath/Qwen3-0.6B-Q4_K_M.gguf" && /opt/llama.cpp/llama-server -m "$filePath/Qwen3-0.6B-Q4_K_M.gguf" --host 0.0.0.0 --port 8080 --no-webui $server_param > "$job_path/qwen3_server.log" 2>&1 &
     sleep 1
     ps_count=$(ps aux | grep "llama-server" |grep -v grep | wc -l)
     echo "ps_count: $ps_count"
     if [ "$ps_count" -eq 0 ]; then
-        nohup /opt/llama.cpp/llama-server -m "$filePath/qwen2.5-0.5b-instruct-q4_k_m.gguf" --host 0.0.0.0 --port 8080 --no-webui  > "$job_path/qwen2.5_server.log" 2>&1 &
+        nohup /opt/llama.cpp/llama-server -m "$filePath/qwen2.5-0.5b-instruct-q4_k_m.gguf" --host 0.0.0.0 --port 8080 --no-webui $server_param > "$job_path/qwen2.5_server.log" 2>&1 &
     fi
     sleep 1
 fi

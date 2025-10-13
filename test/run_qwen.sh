@@ -34,13 +34,27 @@ while [ $# -gt 0 ]; do
             export LLAMA_ARG_THINK_BUDGET=0
             shift 1
             ;;
+        # 严格模式，遇到报错就退出    
+        --strict)
+            set -e
+            shift 1
+            ;;
         -h)
             echo "用法：$0 [-t <值>] [其他参数...]"
             echo "  -t <值>   环境变量LLAMA_ARG_THREADS的值"
-            echo "  -n <值>   环境变量LLAMA_ARG_N_PREDICT的值"     
+            echo "  -n <值>   环境变量LLAMA_ARG_N_PREDICT的值"
             echo " --no-think 关闭深度思考"
             echo "  -h        显示帮助信息"
             exit 0
+            ;;
+        # 匹配带=号的参数
+        *=*)
+            key="${1%%=*}"
+            value="${1#*=}"
+            echo "发现参数: key='$key', value='$value'"
+            # 方式1: 使用 declare (推荐，更安全)
+            declare "$key"="$value"
+            shift 1
             ;;
         # 处理未定义的参数（可根据需求选择忽略或报错）
         *)

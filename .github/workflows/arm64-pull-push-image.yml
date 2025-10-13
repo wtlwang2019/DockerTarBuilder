@@ -120,23 +120,23 @@ jobs:
         env:
           GITHUB_REPOSITORY_OWNER: '${{ github.repository_owner }}'          
 
-      - name: Build and push Full Docker image
-        if: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.config.full == true }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: ${{ matrix.config.platforms }}
-          # tag list is generated from step above
-          tags: ${{ steps.tag.outputs.full_output_tags }}
-          file: ${{ inputs.dockerfile_path }}
-          # target: full
-          provenance: false
-          build-args: |
-            TARGETARCH=arm64          
-          # using github experimental cache
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
-          # return to this if the experimental github cache is having issues
-          # cache-to: type=local,dest=/tmp/.buildx-cache
-          # cache-from: type=local,src=/tmp/.buildx-cache
+      # - name: Build and push Full Docker image
+      #   if: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.config.full == true }}
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     push: true
+      #     platforms: ${{ matrix.config.platforms }}
+      #     # tag list is generated from step above
+      #     tags: ${{ steps.tag.outputs.full_output_tags }}
+      #     file: ${{ inputs.dockerfile_path }}
+      #     # target: full
+      #     provenance: false
+      #     build-args: |
+      #       TARGETARCH=arm64          
+      #     # using github experimental cache
+      #     # cache-from: type=gha
+      #     # cache-to: type=gha,mode=max
+      #     # return to this if the experimental github cache is having issues
+      #     # cache-to: type=local,dest=/tmp/.buildx-cache
+      #     # cache-from: type=local,src=/tmp/.buildx-cache

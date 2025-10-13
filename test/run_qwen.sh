@@ -3,8 +3,6 @@
 ## 0.读取入参
 # 功能：检查入参中是否包含 -t，并获取其后续值
 # 用法：./run_qwen.sh [-t <值>] [其他参数...]
-
-t=""  # 初始化变量t
 # 循环处理所有参数
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -61,6 +59,7 @@ while [ $# -gt 0 ]; do
             echo "  -t <值>   环境变量LLAMA_ARG_THREADS的值"
             echo "  -n <值>   环境变量LLAMA_ARG_N_PREDICT的值"
             echo " --no-think 关闭深度思考"
+            echo " --server_param 'str' llama-server启动的参数"            
             echo "  -h        显示帮助信息"
             exit 0
             ;;

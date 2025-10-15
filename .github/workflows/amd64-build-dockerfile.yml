@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       project_path:
-        description: '项目地址：docker Build的当前路径'
+        description: '项目地址：docker build的当前路径'
         required: true
         default: 'llama_cpp'
       dockerfile_path:

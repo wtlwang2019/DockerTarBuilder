@@ -50,7 +50,7 @@ jobs:
             gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
             rm "${image_name}-amd64.tar"
             ls
-            cp *.tar.gz ../
+            mv *.tar.gz ../
 
   
       - name: Upload artifact

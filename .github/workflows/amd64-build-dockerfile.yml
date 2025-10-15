@@ -3,10 +3,14 @@ name: Build Docker Image (No Push)
 on: 
   workflow_dispatch:
     inputs:
-      project_path:
-        description: 'Dokerfile 所属的项目路径'
+      build_path:
+        description: 'docker Build的当前路径'
         required: true
-        default: 'zookeeper'
+        default: '.'
+      dockerfile_path:
+        description: 'Dockerfile的路径'
+        required: false
+        default: ''
 
 jobs:
   build:

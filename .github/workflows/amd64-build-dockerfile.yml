@@ -3,12 +3,12 @@ name: Build Docker Image (No Push)
 on: 
   workflow_dispatch:
     inputs:
-      build_path:
-        description: 'docker Build的当前路径'
+      project_path:
+        description: '项目地址：docker Build的当前路径'
         required: true
-        default: '.'
+        default: 'llama_cpp'
       dockerfile_path:
-        description: 'Dockerfile的路径'
+        description: 'Dockerfile的路径;例如：bash.Dockerfile'
         required: false
         default: ''
 
@@ -33,15 +33,20 @@ jobs:
           
       - name: Pull Docker Images and Package
         env: 
-          image: ${{ github.event.inputs.project_path }}
-          image_name: ${{ github.event.inputs.project_path }}
+          cur_path: ${{ inputs.project_path }}
+          dockerfile_path: ${{ inputs.dockerfile_path }}
+          image_name: ${{ inputs.project_path }}
         run: |
             pwd
             ls
-            cd ${image}
-            docker build -t ${image}:local .
+            cd ${cur_path}
+            if [ -n "$dockerfile_path" ]; then
+              docker build -t "${image_name}:local-amd64"  -f "$dockerfile_path"  .
+            else
+              docker build -t ${image_name}:local-amd64  .
+            fi
             docker images -a
-            docker save "${image}:local" -o "${image_name}-amd64.tar"
+            docker save "${image_name}:local-amd64" -o "${image_name}-amd64.tar"
             gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
             rm "${image_name}-amd64.tar"
             ls

@@ -11,14 +11,14 @@ on:
         description: '请填写page_size'
         required: true
         default: '100' 
-      namespace:
-        description: '请填写docker镜像的namespace'
-        required: true
-        default: 'library'    
+      # namespace:
+      #   description: '请填写docker镜像的namespace, 已废弃'
+      #   required: true
+      #   default: 'library'    
       docker_images:
-        description: '请填写docker镜像名称,多个用英文逗号分开'
+        description: '请填写docker镜像名称,多个用英文逗号分开; 官方镜像需带library/前缀'
         required: true
-        default: 'alpine,nginx,busybox'
+        default: 'library/alpine,openeuler/vllm-cpu,library/busybox'
 
 jobs:
   search_and_package:
@@ -37,7 +37,7 @@ jobs:
           IFS=',' read -r -a image_array <<< "$images"
           success=false
           for image in "${image_array[@]}"; do
-            if curl -f -o "${image}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=${page}&page_size=${pagesize}"; then
+            if curl -f -o "${image//\//_}.tags.txt" "https://registry.hub.docker.com/v2/repositories/${image}/tags?page=${page}&page_size=${pagesize}"; then
               echo "Downloaded tags for $image"
               success=true
             else
@@ -51,11 +51,7 @@ jobs:
           ls -l
           tar -czvf tags.tar.gz *.txt
           rm *.txt
-          # for image in "${image_array[@]}"; do
-          #   curl -o "${image}.tags.txt" https://registry.hub.docker.com/v2/repositories/${namespace}/${image}/tags?page=1&page_size=50 
-          # done
-          # ls -l
-          # tar -czvf tags.tar.gz *.txt
+
           #gzip -c *.tags.txt > "tags.txt.gz"
 
       - name: List generated files (debug step)

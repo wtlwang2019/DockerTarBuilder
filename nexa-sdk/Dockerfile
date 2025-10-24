@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+RUN apt update && apt install -y curl
+
 RUN curl -fsSL https://github.com/NexaAI/nexa-sdk/releases/latest/download/nexa-cli_linux_x86_64.sh -o install.sh && chmod +x install.sh && ./install.sh && rm install.sh
 
 RUN nexa -h

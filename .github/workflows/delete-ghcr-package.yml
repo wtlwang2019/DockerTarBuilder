@@ -12,15 +12,24 @@ jobs:
       packages: write    # Required for package deletion
       
     steps:
-      - name: Cleanup old packages
-        uses: 404cerebrum/cleanup-ghcr-packages@v1
-        with:
-          # Required inputs:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Cleanup old packages
+      #   uses: 404cerebrum/cleanup-ghcr-packages@v1
+      #   with:
+      #     # Required inputs:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
           
-          # Optional inputs (shown with defaults):
-          # org: ''                          # Organization name (if using org account)
-          username: ${{ github.repository_owner }}  # Username (if using personal account)
-          package-name: 'llamacpp'                 # Defaults to repository name if empty
-          days: '3'                       # Number of days to keep packages 
-          dry-run: 'false'                 # Set to 'true' to only list packages without deleting
+      #     # Optional inputs (shown with defaults):
+      #     # org: ''                          # Organization name (if using org account)
+      #     username: ${{ github.repository_owner }}  # Username (if using personal account)
+      #     package-name: 'llamacpp'                 # Defaults to repository name if empty
+      #     days: '3'                       # Number of days to keep packages 
+      #     dry-run: 'false'                 # Set to 'true' to only list packages without deleting
+      - name: Cleanup old packages 2
+        uses: smartsquaregmbh/delete-old-packages@v0.8.1
+        with:
+          user: ${{ github.repository_owner }}
+          type: container
+          keep: 0
+          names: |
+            llamacpp
+          

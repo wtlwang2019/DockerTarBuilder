@@ -1,0 +1,26 @@
+name: Cleanup GHCR packages
+
+on:
+  # schedule:
+  #   - cron: '0 0 * * 0'  # Run weekly on Sundays
+  workflow_dispatch:     # Allow manual triggering
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write    # Required for package deletion
+      
+    steps:
+      - name: Cleanup old packages
+        uses: 404cerebrum/cleanup-ghcr-packages@v1
+        with:
+          # Required inputs:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Optional inputs (shown with defaults):
+          # org: ''                          # Organization name (if using org account)
+          username: ${{ github.repository_owner }}  # Username (if using personal account)
+          package-name: 'llamacpp'                 # Defaults to repository name if empty
+          days: '3'                       # Number of days to keep packages 
+          dry-run: 'true'                 # Set to 'true' to only list packages without deleting

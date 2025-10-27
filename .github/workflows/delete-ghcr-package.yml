@@ -23,4 +23,4 @@ jobs:
           username: ${{ github.repository_owner }}  # Username (if using personal account)
           package-name: 'llamacpp'                 # Defaults to repository name if empty
           days: '3'                       # Number of days to keep packages 
-          dry-run: 'true'                 # Set to 'true' to only list packages without deleting
+          dry-run: 'false'                 # Set to 'true' to only list packages without deleting

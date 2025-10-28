@@ -24,7 +24,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Free Disk Space (Ubuntu)
-        if: ${{ matrix.config.free_disk_space == true }}
         uses: ggml-org/free-disk-space@v1.3.1
         with:
           # this might remove tools that are actually needed,

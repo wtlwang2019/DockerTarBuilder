@@ -41,7 +41,7 @@ RUN mkdir -p build && cd build && cmake .. -DMNN_LOW_MEMORY=true -DMNN_CPU_WEIGH
 FROM ubuntu:22.04
 
 # 只保留运行时需要的库（根据实际需求可自行裁剪）
-RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6  ca-certificates libopencv-core libopencv-imgproc &&  rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6  ca-certificates libopencv-dev &&  rm -rf /var/lib/apt/lists/*
 
 # 将编译好的文件拷贝到运行时镜像
 COPY --from=builder /opt/MNN/build /opt/MNN/build

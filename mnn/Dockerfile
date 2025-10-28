@@ -23,14 +23,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # 一次性安装编译所需工具
 #   git、gcc/g++、cmake、make、curl、ca‑certificates 等
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        git \
-        build-essential \   # 包含 gcc、g++、make
-        cmake \
-        curl \
-        ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake curl  ca-certificates &&  rm -rf /var/lib/apt/lists/*
 
 # 工作目录
 WORKDIR /opt
@@ -40,23 +33,14 @@ RUN git clone https://github.com/alibaba/MNN.git
 
 # 编译
 WORKDIR /opt/MNN
-RUN mkdir -p build && cd build && \
-    cmake .. \
-        -DMNN_LOW_MEMORY=true \
-        -DMNN_CPU_WEIGHT_DEQUANT_GEMM=true \
-        -DMNN_BUILD_LLM=true \
-        -DMNN_SUPPORT_TRANSFORMER_FUSE=true && \
-    make -j$(nproc)
+RUN mkdir -p build && cd build && cmake .. -DMNN_LOW_MEMORY=true -DMNN_CPU_WEIGHT_DEQUANT_GEMM=true -DMNN_BUILD_LLM=true -DMNN_SUPPORT_TRANSFORMER_FUSE=true
+RUN make -j$(nproc)
 
 # ---------- Runtime 阶段 ----------
 FROM ubuntu:22.04
 
 # 只保留运行时需要的库（根据实际需求可自行裁剪）
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        libstdc++6 \
-        ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6  ca-certificates &&  rm -rf /var/lib/apt/lists/*
 
 # 将编译好的文件拷贝到运行时镜像
 COPY --from=builder /opt/MNN/build /opt/MNN/build

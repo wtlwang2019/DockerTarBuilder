@@ -1,0 +1,80 @@
+name: Build Docker Image (No Push)
+
+on: 
+  workflow_dispatch:
+    inputs:
+      project_path:
+        description: '项目地址：docker build的当前路径'
+        required: true
+        default: 'llama_cpp'
+      dockerfile_path:
+        description: 'Dockerfile的路径;例如：bash.Dockerfile'
+        required: false
+        default: ''
+      dst_tag:
+        description: 'ghcr.io上的image tag'
+        required: true
+        default: 'latest-amd64'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        if: ${{ matrix.config.free_disk_space == true }}
+        uses: ggml-org/free-disk-space@v1.3.1
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+          
+      - name: Build Docker Image
+        env: 
+          cur_path: ${{ inputs.project_path }}
+          dockerfile_path: ${{ inputs.dockerfile_path }}
+          image_name: ${{ inputs.project_path }}
+        run: |
+            pwd
+            ls
+            cd ${cur_path}
+            if [ -n "$dockerfile_path" ]; then
+              docker build -t "${image_name}:latest-amd64"  -f "$dockerfile_path"  .
+            else
+              docker build -t ${image_name}:latest-amd64  .
+            fi
+            docker images -a
+            # docker save "${image_name}:local-amd64" -o "${image_name}-amd64.tar"
+            # gzip -c "${image_name}-amd64.tar" > "${image_name}-amd64.tar.gz"
+            # rm "${image_name}-amd64.tar"
+            # ls
+            # mv *.tar.gz ../
+
+      - name: push docker image to ghcr.io
+        id: push
+        shell: bash
+        run: |
+          image_tag="${image_name}:${dst_tag}"
+          full_tag="ghcr.io/${GITHUB_REPOSITORY_OWNER}/${image_tag}"
+          df -h
+          docker tag "${image_name}:latest-amd64" "$full_tag"
+          docker push "${full_tag}"
+        env:
+          GITHUB_REPOSITORY_OWNER: '${{ github.repository_owner }}' 
+          image_name: ${{ inputs.project_path }}
+          dst_tag: ${{ inputs.dst_tag }}

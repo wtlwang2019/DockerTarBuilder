@@ -33,7 +33,9 @@ RUN git clone https://github.com/alibaba/MNN.git
 
 # 编译
 WORKDIR /opt/MNN
-RUN mkdir -p build && cd build && cmake .. -DMNN_LOW_MEMORY=true -DMNN_CPU_WEIGHT_DEQUANT_GEMM=true -DMNN_BUILD_LLM=true -DMNN_SUPPORT_TRANSFORMER_FUSE=true -DMNN_BUILD_LLM_OMNI=true && make -j$(nproc)
+RUN mkdir -p build && cd build && cmake .. -DMNN_LOW_MEMORY=true -DMNN_CPU_WEIGHT_DEQUANT_GEMM=true -DMNN_BUILD_LLM=true -DMNN_SUPPORT_TRANSFORMER_FUSE=true -DMNN_BUILD_LLM_OMNI=true \
+    -DMNN_OPENCV_TEST=ON -DMNN_IMGCODECS=ON -DMNN_OPENCV_BENCH=ON   && \
+    make -j$(nproc)
 
 # ---------- Runtime 阶段 ----------
 FROM ubuntu:22.04

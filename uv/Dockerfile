@@ -20,5 +20,5 @@ RUN uv self update
 RUN uv --version
 
 # 在/opt/python目录下安装python3.10
-ENV UV_PYTHON_INSTALL_DIR=/opt/python/3.10
-RUN uv python install 3.10  -i /opt/python/3.10
+ENV UV_PYTHON_INSTALL_DIR=/opt/python
+RUN uv python install 3.10  -i /opt/python

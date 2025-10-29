@@ -1,11 +1,11 @@
-From ubuntu:22.04 AS uv
+FROM ubuntu:22.04 AS uv
 
 # 设置非交互式安装，避免 tzdata 等交互提示
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 一次性安装编译所需工具
 #  curl、ca‑certificates 等
-RUN apt-get update && apt-get install -y --no-install-recommends  curl &&  rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends  curl ca‑certificates &&  rm -rf /var/lib/apt/lists/*
 
 # 工作目录
 WORKDIR /opt

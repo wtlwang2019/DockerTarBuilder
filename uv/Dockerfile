@@ -19,4 +19,4 @@ ENV PATH="$HOME/.local/bin:$PATH"
 
 # 在/opt/python目录下安装python3.10
 
-RUN uv python install 3.10 --path /opt/python/3.10
+RUN uv python install 3.10  --prefix /opt/python/3.10

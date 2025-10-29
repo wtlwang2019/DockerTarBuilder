@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends  curl  ca-certi
 # 工作目录
 WORKDIR /opt
 
+# 显式定义HOME（消除警告）root 用户
+ENV HOME="/root"
 # 官方一键安装命令（Linux/macOS通用）
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 # 添加uv到path

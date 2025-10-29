@@ -12,7 +12,8 @@ WORKDIR /opt
 
 # 官方一键安装命令（Linux/macOS通用）
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="$HOME/.local/bin:$PATH"  # 假设env文件主要是添加PATH
+# 添加uv到path
+ENV PATH="$HOME/.local/bin:$PATH"
 
 # 在/opt/python目录下安装python3.10
 

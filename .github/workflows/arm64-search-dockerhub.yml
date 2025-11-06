@@ -49,7 +49,9 @@ jobs:
             exit 2
           fi
           ls -l
-          # python parse_dockerhub_json.py "${image}.search.txt"
+          if [ -f "${image}.update.search.txt" ]; then
+            python parse_dockerhub_json.py "${image}.update.search.txt"
+          fi
           tar -czvf "${image}.search.gz" *.txt *.csv *.json
           rm *.txt
           # for image in "${image_array[@]}"; do

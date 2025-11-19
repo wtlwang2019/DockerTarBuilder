@@ -57,11 +57,11 @@ jobs:
                 // 如果 waitForFunction 成功，则页面高度已变化，更新 previousHeight
                 previousHeight = await page.evaluate('document.body.scrollHeight');
                 scrollTimes++;
-                console.log(`已滚动 ${scrollTimes} 次，当前页面高度：${previousHeight}px`);
+                console.log('已滚动次数:', scrollTimes, '当前页面高度：', previousHeight);
               }
             
               if (scrollTimes >= maxScrollTimes) {
-                console.warn(`已达到最大滚动次数 ${maxScrollTimes}，可能未完全滚动到底部。`);
+                console.warn('已达到最大滚动次数，可能未完全滚动到底部。');
               }                
 
           }              

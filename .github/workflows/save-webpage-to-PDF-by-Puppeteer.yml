@@ -27,6 +27,38 @@ jobs:
         run: |
           node -e "
           const puppeteer = require('puppeteer');
+          async function autoScrollToBottom(page) {
+              // 滚动间隔（毫秒），避免滚动过快导致内容加载不及时
+              const scrollDelay = 1000; 
+              // 最大滚动次数（防止无限循环）
+              const maxScrollTimes = 20; 
+              // 初始页面高度
+              let previousHeight = await page.evaluate('document.body.scrollHeight');
+              let scrollTimes = 0;
+            
+              while (scrollTimes < maxScrollTimes) {
+                // 模拟鼠标滚轮向下滚动（deltaY 为滚动距离，1000 足够触发懒加载）
+                await page.mouse.wheel({ deltaY: 1000 });
+                // 等待内容加载
+                await page.waitForTimeout(scrollDelay); 
+                // 获取当前页面高度
+                const currentHeight = await page.evaluate('document.body.scrollHeight');
+                
+                // 关键判断：如果高度不再变化，说明已到底部
+                if (currentHeight === previousHeight) {
+                  console.log('页面高度不再变化，已滚动到底部');
+                  break;
+                }
+                
+                previousHeight = currentHeight;
+                scrollTimes++;
+                console.log(`已滚动 ${scrollTimes} 次，当前页面高度：${currentHeight}px`);
+              }
+            
+              if (scrollTimes >= maxScrollTimes) {
+                console.warn(`已达到最大滚动次数 ${maxScrollTimes}，可能未完全滚动到底部`);
+              }
+          }              
           (async () => {
             const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
             const page = await browser.newPage();
@@ -49,7 +81,9 @@ jobs:
               await browser.close();
               process.exit(1);
             }
+                    
             // await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+            await autoScrollToBottom(page);
             await page.pdf({
               path: 'output.pdf',
               format: 'A4',

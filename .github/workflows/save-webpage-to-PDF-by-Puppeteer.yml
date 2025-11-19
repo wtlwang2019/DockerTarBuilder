@@ -40,7 +40,8 @@ jobs:
                 // 模拟鼠标滚轮向下滚动（deltaY 为滚动距离，1000 足够触发懒加载）
                 await page.mouse.wheel({ deltaY: 1000 });
                 // 等待内容加载
-                await page.waitForTimeout(scrollDelay); 
+                await page.waitForFunction((ms) => new Promise(resolve => setTimeout(resolve, ms)), {}, scrollDelay);
+                // await page.waitForTimeout(scrollDelay); 
                 // 获取当前页面高度
                 const currentHeight = await page.evaluate('document.body.scrollHeight');
                 

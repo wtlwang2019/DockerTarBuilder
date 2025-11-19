@@ -7,7 +7,6 @@ on:
         description: '网页的url'
         required: true
         default: 'https://github.com'
-      dockerfile_path:
 
 jobs:
   build:

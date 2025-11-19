@@ -30,13 +30,14 @@ jobs:
           (async () => {
             const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
             const page = await browser.newPage();
-            await page.setViewport({ width: 1690, height: 1200 });
+            await page.setViewport({ width: 1200, height: 800 });
             // 从环境变量中读取 URL
             const url = process.env.WEBPAGE_URL;
             if (!url) {
               console.error('错误：环境变量 WEBPAGE_URL 未设置');
               process.exit(1);
             }
+            console.info('url 设置了');
             try {
               // 增加 timeout 时间，例如 60000 毫秒（60秒）
               await page.goto(url, { 

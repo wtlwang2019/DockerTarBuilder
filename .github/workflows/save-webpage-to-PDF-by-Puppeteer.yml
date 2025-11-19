@@ -40,25 +40,30 @@ jobs:
                 // 模拟鼠标滚轮向下滚动（deltaY 为滚动距离，1000 足够触发懒加载）
                 await page.mouse.wheel({ deltaY: 1000 });
                 // 等待内容加载
-                await page.waitForFunction((ms) => new Promise(resolve => setTimeout(resolve, ms)), {}, scrollDelay);
-                // await page.waitForTimeout(scrollDelay); 
-                // 获取当前页面高度
-                const currentHeight = await page.evaluate('document.body.scrollHeight');
-                
-                // 关键判断：如果高度不再变化，说明已到底部
-                if (currentHeight === previousHeight) {
-                  console.log('页面高度不再变化，已滚动到底部');
+                // 等待一小段时间，让内容有机会加载。我们使用 waitForFunction 并设置一个明确的超时。
+                try {
+                  // 等待 60 秒，直到页面高度发生变化，或者超时
+                  await page.waitForFunction(
+                    (prevHeight) => document.body.scrollHeight > prevHeight,
+                    { timeout: 60000 },
+                    previousHeight
+                  );
+                } catch (error) {
+                  // 如果 waitForFunction 超时，说明在 60 秒内页面高度没有变化，认为已到底部
+                  console.log('等待页面高度变化超时，已滚动到底部或内容加载完成。');
                   break;
                 }
                 
-                previousHeight = currentHeight;
+                // 如果 waitForFunction 成功，则页面高度已变化，更新 previousHeight
+                previousHeight = await page.evaluate('document.body.scrollHeight');
                 scrollTimes++;
-                console.log(`已滚动 ${scrollTimes} 次，当前页面高度：${currentHeight}px`);
+                console.log(`已滚动 ${scrollTimes} 次，当前页面高度：${previousHeight}px`);
               }
             
               if (scrollTimes >= maxScrollTimes) {
-                console.warn(`已达到最大滚动次数 ${maxScrollTimes}，可能未完全滚动到底部`);
-              }
+                console.warn(`已达到最大滚动次数 ${maxScrollTimes}，可能未完全滚动到底部。`);
+              }                
+
           }              
           (async () => {
             const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });

@@ -22,8 +22,8 @@ jobs:
         run: |
           # 替换为你想要转换的网页 URL
           url=${{ inputs.url }} 
-          wkhtmltopdf --help
-          wkhtmltopdf --javascript-delay 1500 --wait-for-network "$url" output-wk.pdf    
+          wkhtmltopdf -H --help
+          wkhtmltopdf --javascript-delay 1500  "$url" output-wk.pdf    
 
 
   

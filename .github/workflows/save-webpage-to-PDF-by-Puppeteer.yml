@@ -30,7 +30,7 @@ jobs:
           (async () => {
             const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
             const page = await browser.newPage();
-            await page.setViewport({ width: 1200, height: 1690 });
+            await page.setViewport({ width: 1690, height: 1200 });
             // 从环境变量中读取 URL
             const url = process.env.WEBPAGE_URL;
             if (!url) {
@@ -41,6 +41,7 @@ jobs:
             await page.pdf({
               path: 'output.pdf',
               format: 'A4',
+              landscape: true,
               printBackground: true
             });
             await browser.close();

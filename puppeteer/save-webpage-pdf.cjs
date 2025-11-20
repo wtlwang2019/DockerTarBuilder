@@ -17,15 +17,16 @@ async function autoScrollToBottom(page) {
       // 等待内容加载
       // 等待一小段时间，让内容有机会加载。我们使用 waitForFunction 并设置一个明确的超时。
       try {
-        // 等待 3 秒，直到页面高度发生变化，或者超时
+        // 等待 10 秒，直到页面高度发生变化，或者超时
         await page.waitForFunction(
           (prevHeight) => document.body.scrollHeight > prevHeight,
-          { timeout: 3000 },
+          { timeout: 10000 },
           previousHeight
         );
       } catch (error) {
-        // 如果 waitForFunction 超时，说明在 60 秒内页面高度没有变化，认为已到底部
+        // 如果 waitForFunction 超时，说明在 10 秒内页面高度没有变化，认为已到底部
         console.log('等待页面高度变化超时，已滚动到底部或内容加载完成。');
+        break;
       }
       
       // 如果 waitForFunction 成功，则页面高度已变化，更新 previousHeight
@@ -74,7 +75,7 @@ async function autoScrollToBottom2(page) {
     const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(60000);
-    await page.setViewport({ width: 800, height: 800 });
+    await page.setViewport({ width: 800, height: 600 });
     // 从环境变量中读取 URL
     const url = process.env.WEBPAGE_URL;
     if (!url) {

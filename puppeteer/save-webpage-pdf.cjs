@@ -208,29 +208,26 @@ const outputPath = 'output/webpage.mhtml';
 
   // 2️⃣ 打开包含 iframe 的页面
   await page.goto(targetUrl, { waitUntil: 'networkidle2' });
-
-  // 3️⃣ 找到页面中的第一个 iframe
-  const firstIframeHandle = await page.$('iframe');
-  if (!firstIframeHandle) {
+    
+  // 3️⃣ 等待页面出现第一个 iframe（如果页面里有多个，可自行改为更具体的 selector）
+  const iframeHandle = await page.waitForSelector('iframe', { timeout: 15000 });
+  if (!iframeHandle) {
     console.error('❌ 页面中未找到任何 iframe');
     await browser.close();
     return;
   }
 
-  // 4️⃣ 通过句柄获取对应的 Frame 对象
-  const allFrames = page.frames();                     // 包含主帧 + 所有子帧
-  const iframeElement = await firstIframeHandle.evaluateHandle(el => el);
-  const iframeUrl = await firstIframeHandle.evaluate(el => el.src);
-  const targetFrame = allFrames.find(f => f.url() === iframeUrl);
-
+  // 4️⃣ 通过 contentFrame() 直接拿到子帧对象
+  const targetFrame = await iframeHandle.contentFrame();
   if (!targetFrame) {
-    console.error('❌ 未能在 page.frames() 中匹配到对应的子帧');
+    console.error('❌ contentFrame() 返回 null，iframe 可能尚未加载完成');
     await browser.close();
     return;
   }
 
-  // 5️⃣ 检查同源（如果跨域，targetFrame._client 将不可用）
+  // 5️⃣ 同源检查（跨域 iframe 无法使用 CDP）
   const mainOrigin = new URL(page.url()).origin;
+  const iframeUrl = targetFrame.url();               // 已经是加载完成后的 URL
   const iframeOrigin = new URL(iframeUrl).origin;
   if (mainOrigin !== iframeOrigin) {
     console.error(`❌ iframe 为跨域 (${iframeOrigin})，无法直接在子帧上使用 CDP`);
@@ -263,7 +260,7 @@ const outputPath = 'output/webpage.mhtml';
   });
 
   // 9️⃣ 保存为本地文件
-  const outFile = 'output/first-iframe-table.mhtml';
+  const outFile = 'first-iframe-table.mhtml';
   fs.writeFileSync(outFile, mhtml, 'utf8');
   console.log(`✅ MHTML 已保存为 ${outFile}`);
 

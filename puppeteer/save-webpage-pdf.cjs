@@ -230,10 +230,42 @@ const outputPath = 'output/webpage.mhtml';
   const iframeUrl = targetFrame.url();               // 已经是加载完成后的 URL
   const iframeOrigin = new URL(iframeUrl).origin;
   if (mainOrigin !== iframeOrigin) {
-    console.error(`❌ iframe 为跨域 (${iframeOrigin})，无法直接在子帧上使用 CDP`);
-    console.error('   请改用方案 B（单独打开 iframe src）');
-    await browser.close();
-    return;
+    console.warn(`❌ iframe 为跨域 (${iframeOrigin})，无法直接在子帧上使用 CDP`);
+    console.warn('   请改用方案 B（单独打开 iframe src）');
+    const iframeSrc = iframeUrl;
+    console.log('✅ 找到 iframe src:', iframeSrc);
+    
+    // 3️⃣ 在新页面打开该 src
+    const iframePage = await browser.newPage();
+    await iframePage.goto(iframeSrc, { waitUntil: 'networkidle2' });
+    // 4️⃣ 等待表格渲染（同样需要根据实际 selector 调整）
+    const TABLE_SELECTOR = 'table';
+    await iframePage.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
+    
+    // 检查是否已有行
+    const hasRows = await iframePage.evaluate((sel) => {
+        const tbl = document.querySelector(sel);
+        if (!tbl) return false;
+        return tbl.querySelectorAll('tbody tr, tr:not(:has(thead))').length > 0;
+        }, TABLE_SELECTOR);
+    
+    if (!hasRows) {
+        console.warn('⚠️ 表格仍为空，尝试滚动...');
+        await autoScroll(iframePage);
+    }
+    
+    // 5️⃣ 抓取 MHTML（此时只针对 iframe 页面本身）
+    const client = await iframePage.target().createCDPSession();
+    const { data: mhtml } = await client.send('Page.captureSnapshot', {
+        format: 'mhtml'
+    });
+    
+    // 6️⃣ 保存为独立文件
+    fs.writeFileSync('output/cross-iframe-table.mhtml', mhtml, 'utf8');
+    console.log('✅ 跨域 iframe 表格已保存为 cross-iframe-table.mhtml');
+    
+    await browser.close(); 
+    return
   }
 
   // 6️⃣ 在子帧内部等待表格渲染完成

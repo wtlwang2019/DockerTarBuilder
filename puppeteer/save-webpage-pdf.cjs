@@ -165,5 +165,16 @@ async function savePageAsMHTML_JS(url, outputPath) {
 const targetUrl = process.env.WEBPAGE_URL;
 const outputPath = 'output/webpage.mhtml';
 
-savePageAsMHTML_JS(targetUrl, outputPath);
+savePageAsMHTML_JS(targetUrl, outputPath)
+  .then(() => {
+    // 当异步函数成功完成时执行
+    console.log('网页已成功保存。');
+  })
+  .catch((error) => {
+    // 当异步函数内部抛出错误时执行
+    console.error('保存网页时发生错误:', error);
+  });
+
+// 注意：这行代码会立即执行，不会等待上面的异步操作完成
+console.log('保存任务已启动...');
 

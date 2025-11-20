@@ -93,7 +93,7 @@ async function autoScrollToBottom2(page) {
   // await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
   await autoScrollToBottom2(page);
   await page.pdf({
-    path: 'output.mhtml',
+    path: 'output/webpage.pdf',
     format: 'A4',
     landscape: true,
     scale: 0.8,

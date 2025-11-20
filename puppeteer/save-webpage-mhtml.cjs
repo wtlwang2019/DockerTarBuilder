@@ -221,7 +221,7 @@ const outputPath = 'output/webpage.mhtml';
         return false;
     }, TABLE_SELECTOR);
     
-    if (!hasRows) {
+    if (!hasData) {
         console.warn('⚠️ 表格仍为空，尝试滚动...');
         await scrollTableContainer(iframePage, TABLE_SELECTOR);
     }
@@ -246,17 +246,17 @@ const outputPath = 'output/webpage.mhtml';
 
   // 7️⃣ 确认表格已有数据行（防止只渲染空表格）
   let hasData = await targetFrame.evaluate((sel) => {
-  const tbl = document.querySelector(sel);
-  if (!tbl) return false;
-    const cells = tbl.querySelectorAll('tbody td, td');
-    for (const cell of cells) {
-    if (cell.textContent && cell.textContent.trim().length > 0) {
-      return true;}
-    }
-    return false;
+      const tbl = document.querySelector(sel);
+      if (!tbl) return false;
+        const cells = tbl.querySelectorAll('tbody td, td');
+        for (const cell of cells) {
+        if (cell.textContent && cell.textContent.trim().length > 0) {
+          return true;}
+        }
+        return false;
   }, TABLE_SELECTOR);
 
-  if (!hasRows) {
+  if (!hasData) {
     console.warn('⚠️ 表格仍为空，尝试滚动或等待更多时间...');
     await scrollTableContainer(targetFrame, TABLE_SELECTOR);
   }

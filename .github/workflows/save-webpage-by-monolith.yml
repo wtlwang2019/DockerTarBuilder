@@ -18,7 +18,8 @@ jobs:
       - name: Install monolith
         run: |
           id
-          sudo apt update && sudo apt install -y chromium
+          # sudo apt update && sudo apt install -y chromium
+          sudo snap install chromium
           sudo snap install monolith
   
       - name: Create HTML from Webpage

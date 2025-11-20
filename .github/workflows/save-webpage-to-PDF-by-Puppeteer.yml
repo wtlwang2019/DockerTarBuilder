@@ -25,7 +25,7 @@ jobs:
   
       - name: Create PDF from Webpage
         run: |
-          node puppeteer/save-webpage-pdf.js
+          node puppeteer/save-webpage-pdf.cjs
           ls -l
           ls -l puppeteer
         env:

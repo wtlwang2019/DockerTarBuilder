@@ -178,21 +178,119 @@ const outputPath = 'output/webpage.mhtml';
 // // 注意：这行代码会立即执行，不会等待上面的异步操作完成
 // console.log('保存任务已启动...');
 
+
+// mhtml1
+
+// (async () => {
+//   const browser = await puppeteer.launch({headless: true});
+//   const page = await browser.newPage();
+//   const targetUrl = process.env.WEBPAGE_URL;
+//   await page.goto(targetUrl, {waitUntil: 'networkidle2'});
+
+//   // CDP 命令获取 MHTML
+//   const client = await page.target().createCDPSession();
+//   const {data} = await client.send('Page.captureSnapshot', {});
+
+//   // const fs = require('fs');
+//   fs.writeFileSync('output/webpage.mhtml', data, 'utf8');
+
+//   await browser.close();
+// })();
+
+
+// puppeteer-mhtml-first-iframe.js
+
 (async () => {
-  const browser = await puppeteer.launch({headless: true});
+  // 1️⃣ 启动浏览器
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  const targetUrl = process.env.WEBPAGE_URL;
-  await page.goto(targetUrl, {waitUntil: 'networkidle2'});
 
-  // CDP 命令获取 MHTML
-  const client = await page.target().createCDPSession();
-  const {data} = await client.send('Page.captureSnapshot', {});
+  // 2️⃣ 打开包含 iframe 的页面
+  await page.goto('https://www.example.com/with-iframe', { waitUntil: 'networkidle2' });
 
-  // const fs = require('fs');
-  fs.writeFileSync('output/webpage.mhtml', data, 'utf8');
+  // 3️⃣ 找到页面中的第一个 iframe
+  const firstIframeHandle = await page.$('iframe');
+  if (!firstIframeHandle) {
+    console.error('❌ 页面中未找到任何 iframe');
+    await browser.close();
+    return;
+  }
 
+  // 4️⃣ 通过句柄获取对应的 Frame 对象
+  const allFrames = page.frames();                     // 包含主帧 + 所有子帧
+  const iframeElement = await firstIframeHandle.evaluateHandle(el => el);
+  const iframeUrl = await firstIframeHandle.evaluate(el => el.src);
+  const targetFrame = allFrames.find(f => f.url() === iframeUrl);
+
+  if (!targetFrame) {
+    console.error('❌ 未能在 page.frames() 中匹配到对应的子帧');
+    await browser.close();
+    return;
+  }
+
+  // 5️⃣ 检查同源（如果跨域，targetFrame._client 将不可用）
+  const mainOrigin = new URL(page.url()).origin;
+  const iframeOrigin = new URL(iframeUrl).origin;
+  if (mainOrigin !== iframeOrigin) {
+    console.error(`❌ iframe 为跨域 (${iframeOrigin})，无法直接在子帧上使用 CDP`);
+    console.error('   请改用方案 B（单独打开 iframe src）');
+    await browser.close();
+    return;
+  }
+
+  // 6️⃣ 在子帧内部等待表格渲染完成
+  const TABLE_SELECTOR = 'table';   // 根据实际页面自行调整
+  await targetFrame.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
+
+  // 7️⃣ 确认表格已有数据行（防止只渲染空表格）
+  const hasRows = await targetFrame.evaluate((sel) => {
+    const tbl = document.querySelector(sel);
+    if (!tbl) return false;
+    // 统计 <tbody> 中的 <tr>，或直接统计所有非 thead 的 <tr>
+    return tbl.querySelectorAll('tbody tr, tr:not(:has(thead))').length > 0;
+  }, TABLE_SELECTOR);
+
+  if (!hasRows) {
+    console.warn('⚠️ 表格仍为空，尝试滚动或等待更多时间...');
+    await autoScroll(targetFrame);
+  }
+
+  // 8️⃣ 为子帧创建 CDP 会话并抓取 MHTML
+  const client = await targetFrame._client;   // 同源帧才有此属性
+  const { data: mhtml } = await client.send('Page.captureSnapshot', {
+    format: 'mhtml'   // 明确声明，兼容性更好
+  });
+
+  // 9️⃣ 保存为本地文件
+  const outFile = 'output/first-iframe-table.mhtml';
+  fs.writeFileSync(outFile, mhtml, 'utf8');
+  console.log(`✅ MHTML 已保存为 ${outFile}`);
+
+  // 10️⃣ 关闭浏览器
   await browser.close();
 })();
+
+/**
+ * 自动滚动（适用于懒加载/分页的表格）
+ * @param {import('puppeteer').Frame} frame
+ */
+async function autoScroll(frame) {
+  await frame.evaluate(async () => {
+    await new Promise((resolve) => {
+      let totalHeight = 0;
+      const distance = 200;
+      const timer = setInterval(() => {
+        const { scrollHeight } = document.body;
+        window.scrollBy(0, distance);
+        totalHeight += distance;
+        if (totalHeight >= scrollHeight) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 100);
+    });
+  });
+}
 
 
 

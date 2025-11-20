@@ -240,11 +240,15 @@ const outputPath = 'output/webpage.mhtml';
   await targetFrame.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
 
   // 7️⃣ 确认表格已有数据行（防止只渲染空表格）
-  const hasRows = await targetFrame.evaluate((sel) => {
-    const tbl = document.querySelector(sel);
-    if (!tbl) return false;
-    // 统计 <tbody> 中的 <tr>，或直接统计所有非 thead 的 <tr>
-    return tbl.querySelectorAll('tbody tr, tr:not(:has(thead))').length > 0;
+  let hasData = await targetFrame.evaluate((sel) => {
+  const tbl = document.querySelector(sel);
+  if (!tbl) return false;
+    const cells = tbl.querySelectorAll('tbody td, td');
+    for (const cell of cells) {
+    if (cell.textContent && cell.textContent.trim().length > 0) {
+      return true;}
+    }
+    return false;
   }, TABLE_SELECTOR);
 
   if (!hasRows) {

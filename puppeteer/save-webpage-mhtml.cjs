@@ -185,10 +185,10 @@ async function wait_data_loaded(frame) {
   // 1️⃣ 启动浏览器
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  page.setDefaultNavigationTimeout(60000);
+  page.setDefaultNavigationTimeout(90000);
 
   // 2️⃣ 打开包含 iframe 的页面
-  await page.goto(targetUrl, { waitUntil: 'networkidle0' });
+  await page.goto(targetUrl, { waitUntil: 'networkidle2' });
     
   // 3️⃣ 等待页面出现第一个 iframe（如果页面里有多个，可自行改为更具体的 selector）
   const iframeHandle = await page.waitForSelector('iframe', { timeout: 15000 });

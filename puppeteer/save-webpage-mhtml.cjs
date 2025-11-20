@@ -117,7 +117,7 @@ const outputPath = 'output/webpage.mhtml';
 //   const page = await browser.newPage();
 //   page.setDefaultNavigationTimeout(60000);
 //   const targetUrl = process.env.WEBPAGE_URL;
-//   await page.goto(targetUrl, {waitUntil: 'networkidle0'});
+//   await page.goto(targetUrl, {waitUntil: 'networkidle2'});
 
 //   // CDP 命令获取 MHTML
 //   const client = await page.target().createCDPSession();

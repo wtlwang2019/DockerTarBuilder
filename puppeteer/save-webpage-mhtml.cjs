@@ -166,7 +166,7 @@ const outputPath = 'output/webpage.mhtml';
 
 // ================== mhtml2 ======================================
 // puppeteer-mhtml-first-iframe.js
-
+// 网页里内嵌有iframe，需要等到iframe里表格数据加载完成才保存.mhtml文件
 async function checkHasData(frame, selector) {
     return await frame.evaluate((sel) => {
       const tbl = document.querySelector(sel);
@@ -182,6 +182,37 @@ async function checkHasData(frame, selector) {
     }, selector);
 }
 
+async function wait_data_loaded(frame) {
+    // 4️⃣ 等待表格渲染（同样需要根据实际 selector 调整）
+    const TABLE_SELECTOR = 'table';
+    await frame.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
+    
+    // -------------------------------------------------
+    // 6️⃣ 轮询主逻辑：每 3 秒检查一次，最多 60 秒
+    // -------------------------------------------------
+    const POLL_INTERVAL_MS = 3000;   // 3 秒
+    const TIMEOUT_MS = 60000;        // 60 秒
+    const startTime = Date.now();
+    
+    let hasData = false;
+    while (Date.now() - startTime < TIMEOUT_MS) {
+        hasData = await checkHasData(frame, TABLE_SELECTOR);
+        if (hasData) break; // 检测到有效数据，退出循环
+        
+        console.log('⏳ 表格暂无有效数据，等待 3 秒后再次检测...');
+        await new Promise(res => setTimeout(res, POLL_INTERVAL_MS));
+    }
+    
+    if (!hasData) {
+        console.warn('⚠️ 超时 60 秒仍未检测到表格数据，脚本结束。');
+        // await browser.close();
+        // return;
+    }
+    else {
+        console.log('✅ 检测到表格已有有效数据，准备抓取 MHTML。');
+    }
+    return hasData
+}
 
 
 (async () => {
@@ -219,43 +250,18 @@ async function checkHasData(frame, selector) {
     const iframeSrc = iframeUrl;
     console.log('✅ 找到 iframe src:', iframeSrc);
     
-    // 3️⃣ 在新页面打开该 src
+    //  在新页面打开该 src
     const iframePage = await browser.newPage();
     await iframePage.goto(iframeSrc, { waitUntil: 'networkidle2' });
-    // 4️⃣ 等待表格渲染（同样需要根据实际 selector 调整）
-    const TABLE_SELECTOR = 'table';
-    await iframePage.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
-    
-    // -------------------------------------------------
-    // 6️⃣ 轮询主逻辑：每 3 秒检查一次，最多 60 秒
-    // -------------------------------------------------
-    const POLL_INTERVAL_MS = 3000;   // 3 秒
-    const TIMEOUT_MS = 60000;        // 60 秒
-    const startTime = Date.now();
-    
-    let hasData = false;
-    while (Date.now() - startTime < TIMEOUT_MS) {
-        hasData = await checkHasData(iframePage, TABLE_SELECTOR);
-        if (hasData) break; // 检测到有效数据，退出循环
-        
-        console.log('⏳ 表格暂无有效数据，等待 3 秒后再次检测...');
-        await new Promise(res => setTimeout(res, POLL_INTERVAL_MS));
-    }
-    
-    if (!hasData) {
-        console.warn('⚠️ 超时 60 秒仍未检测到表格数据，脚本结束。');
-        // await browser.close();
-        // return;
-    }
 
-    console.log('✅ 检测到表格已有有效数据，准备抓取 MHTML。');
-    // 5️⃣ 抓取 MHTML（此时只针对 iframe 页面本身）
+    let hasData = await wait_data_loaded(iframePage);
+    //  抓取 MHTML（此时只针对 iframe 页面本身）
     const client = await iframePage.target().createCDPSession();
     const { data: mhtml } = await client.send('Page.captureSnapshot', {
         format: 'mhtml'
     });
     
-    // 6️⃣ 保存为独立文件
+    // 保存为独立文件
     fs.writeFileSync('output/cross-iframe-table.mhtml', mhtml, 'utf8');
     console.log('✅ 跨域 iframe 表格已保存为 cross-iframe-table.mhtml');
     
@@ -263,32 +269,7 @@ async function checkHasData(frame, selector) {
     return
   }
     
-    // 6️⃣ 在子帧内部等待表格渲染完成
-    const TABLE_SELECTOR = 'table';   // 根据实际页面自行调整
-    await targetFrame.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
-
-    // -------------------------------------------------
-    //  轮询主逻辑：每 3 秒检查一次，最多 60 秒
-    // -------------------------------------------------
-    const POLL_INTERVAL_MS = 3000;   // 3 秒
-    const TIMEOUT_MS = 60000;        // 60 秒
-    const startTime = Date.now();
-    
-    let hasData = false;
-    while (Date.now() - startTime < TIMEOUT_MS) {
-    hasData = await checkHasData(targetFrame, TABLE_SELECTOR);
-    if (hasData) break; // 检测到有效数据，退出循环
-    
-    console.log('⏳ 表格暂无有效数据，等待 3 秒后再次检测...');
-    await new Promise(res => setTimeout(res, POLL_INTERVAL_MS));
-    }
-    
-    if (!hasData) {
-    console.warn('⚠️ 超时 60 秒仍未检测到表格数据，脚本结束。');
-    // await browser.close();
-    // return;
-    }
-
+  let hasData = await wait_data_loaded(targetFrame);
   // 8️⃣ 为子帧创建 CDP 会话并抓取 MHTML
   const client = await targetFrame._client;   // 同源帧才有此属性
   const { data: mhtml } = await client.send('Page.captureSnapshot', {
@@ -300,7 +281,7 @@ async function checkHasData(frame, selector) {
   fs.writeFileSync(outFile, mhtml, 'utf8');
   console.log(`✅ MHTML 已保存为 ${outFile}`);
 
-  // 10️⃣ 关闭浏览器
+  //  关闭浏览器
   await browser.close();
 })();
 

@@ -117,7 +117,7 @@ const outputPath = 'output/webpage.mhtml';
 //   const page = await browser.newPage();
 //   page.setDefaultNavigationTimeout(60000);
 //   const targetUrl = process.env.WEBPAGE_URL;
-//   await page.goto(targetUrl, {waitUntil: 'networkidle2'});
+//   await page.goto(targetUrl, {waitUntil: 'networkidle0'});
 
 //   // CDP 命令获取 MHTML
 //   const client = await page.target().createCDPSession();
@@ -188,7 +188,7 @@ async function wait_data_loaded(frame) {
   page.setDefaultNavigationTimeout(60000);
 
   // 2️⃣ 打开包含 iframe 的页面
-  await page.goto(targetUrl, { waitUntil: 'networkidle2' });
+  await page.goto(targetUrl, { waitUntil: 'networkidle0' });
     
   // 3️⃣ 等待页面出现第一个 iframe（如果页面里有多个，可自行改为更具体的 selector）
   const iframeHandle = await page.waitForSelector('iframe', { timeout: 15000 });
@@ -218,7 +218,7 @@ async function wait_data_loaded(frame) {
     
     //  在新页面打开该 src
     const iframePage = await browser.newPage();
-    await iframePage.goto(iframeSrc, { waitUntil: 'networkidle2' });
+    await iframePage.goto(iframeSrc, { waitUntil: 'networkidle0' });
 
     let hasData = await wait_data_loaded(iframePage);
     //  抓取 MHTML（此时只针对 iframe 页面本身）

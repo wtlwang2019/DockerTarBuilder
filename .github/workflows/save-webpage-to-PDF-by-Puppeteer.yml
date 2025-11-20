@@ -33,6 +33,15 @@ jobs:
         env:
           # 在这里设置你的 URL 环境变量
           WEBPAGE_URL: ${{ inputs.url }} 
+
+      - name: Create HTML from Webpage
+        run: |
+          node puppeteer/save-webpage-mhtml.cjs
+          ls -l
+          ls -l output
+        env:
+          # 在这里设置你的 URL 环境变量
+          WEBPAGE_URL: ${{ inputs.url }}           
   
       - name: Upload artifact
         uses: actions/upload-artifact@v4

@@ -26,6 +26,8 @@ jobs:
       - name: Create PDF from Webpage
         run: |
           node puppeteer/save-webpage-pdf.js
+          ls -l
+          ls -l puppeteer
         env:
           # 在这里设置你的 URL 环境变量
           WEBPAGE_URL: ${{ inputs.url }} 

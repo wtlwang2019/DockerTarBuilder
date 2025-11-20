@@ -210,11 +210,16 @@ const outputPath = 'output/webpage.mhtml';
     await iframePage.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
     
     // 检查是否已有行
-    const hasRows = await iframePage.evaluate((sel) => {
+    let hasData = await targetFrame.evaluate((sel) => {
         const tbl = document.querySelector(sel);
         if (!tbl) return false;
-        return tbl.querySelectorAll('tbody tr, tr:not(:has(thead))').length > 0;
-        }, TABLE_SELECTOR);
+        const cells = tbl.querySelectorAll('tbody td, td');
+        for (const cell of cells) {
+        if (cell.textContent && cell.textContent.trim().length > 0) {
+          return true;}
+        }
+        return false;
+    }, TABLE_SELECTOR);
     
     if (!hasRows) {
         console.warn('⚠️ 表格仍为空，尝试滚动...');

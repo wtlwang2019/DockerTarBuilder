@@ -210,7 +210,7 @@ const outputPath = 'output/webpage.mhtml';
     await iframePage.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
     
     // 检查是否已有行
-    let hasData = await targetFrame.evaluate((sel) => {
+    let hasData = await iframePage.evaluate((sel) => {
         const tbl = document.querySelector(sel);
         if (!tbl) return false;
         const cells = tbl.querySelectorAll('tbody td, td');

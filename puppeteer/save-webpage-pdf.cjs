@@ -75,7 +75,7 @@ async function autoScrollToBottom2(page) {
     const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(60000);
-    await page.setViewport({ width: 800, height: 600 });
+    await page.setViewport({ width: 800, height: 1200 });
     // 从环境变量中读取 URL
     const url = process.env.WEBPAGE_URL;
     if (!url) {

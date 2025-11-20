@@ -167,6 +167,23 @@ const outputPath = 'output/webpage.mhtml';
 // ================== mhtml2 ======================================
 // puppeteer-mhtml-first-iframe.js
 
+async function checkHasData(frame, selector) {
+    return await frame.evaluate((sel) => {
+      const tbl = document.querySelector(sel);
+      if (!tbl) return false;
+      // 统计所有可能的单元格（tbody、thead、普通 td/th）
+      const cells = tbl.querySelectorAll('tbody td, tbody th, td, th');
+      for (const cell of cells) {
+        if (cell.textContent && cell.textContent.trim().length > 0) {
+          return true; // 至少有一个非空单元格
+        }
+      }
+      return false;
+    }, selector);
+}
+
+
+
 (async () => {
   // 1️⃣ 启动浏览器
   const browser = await puppeteer.launch({ headless: true });
@@ -209,23 +226,29 @@ const outputPath = 'output/webpage.mhtml';
     const TABLE_SELECTOR = 'table';
     await iframePage.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
     
-    // 检查是否已有行
-    let hasData = await iframePage.evaluate((sel) => {
-        const tbl = document.querySelector(sel);
-        if (!tbl) return false;
-        const cells = tbl.querySelectorAll('tbody td, td');
-        for (const cell of cells) {
-        if (cell.textContent && cell.textContent.trim().length > 0) {
-          return true;}
-        }
-        return false;
-    }, TABLE_SELECTOR);
+    // -------------------------------------------------
+    // 6️⃣ 轮询主逻辑：每 3 秒检查一次，最多 60 秒
+    // -------------------------------------------------
+    const POLL_INTERVAL_MS = 3000;   // 3 秒
+    const TIMEOUT_MS = 60000;        // 60 秒
+    const startTime = Date.now();
     
-    if (!hasData) {
-        console.warn('⚠️ 表格仍为空，尝试滚动...');
-        await scrollTableContainer(iframePage, TABLE_SELECTOR);
+    let hasData = false;
+    while (Date.now() - startTime < TIMEOUT_MS) {
+        hasData = await checkHasData(iframePage, TABLE_SELECTOR);
+        if (hasData) break; // 检测到有效数据，退出循环
+        
+        console.log('⏳ 表格暂无有效数据，等待 3 秒后再次检测...');
+        await new Promise(res => setTimeout(res, POLL_INTERVAL_MS));
     }
     
+    if (!hasData) {
+        console.warn('⚠️ 超时 60 秒仍未检测到表格数据，脚本结束。');
+        // await browser.close();
+        // return;
+    }
+
+    console.log('✅ 检测到表格已有有效数据，准备抓取 MHTML。');
     // 5️⃣ 抓取 MHTML（此时只针对 iframe 页面本身）
     const client = await iframePage.target().createCDPSession();
     const { data: mhtml } = await client.send('Page.captureSnapshot', {
@@ -239,27 +262,32 @@ const outputPath = 'output/webpage.mhtml';
     await browser.close(); 
     return
   }
+    
+    // 6️⃣ 在子帧内部等待表格渲染完成
+    const TABLE_SELECTOR = 'table';   // 根据实际页面自行调整
+    await targetFrame.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
 
-  // 6️⃣ 在子帧内部等待表格渲染完成
-  const TABLE_SELECTOR = 'table';   // 根据实际页面自行调整
-  await targetFrame.waitForSelector(TABLE_SELECTOR, { timeout: 15000 });
-
-  // 7️⃣ 确认表格已有数据行（防止只渲染空表格）
-  let hasData = await targetFrame.evaluate((sel) => {
-      const tbl = document.querySelector(sel);
-      if (!tbl) return false;
-        const cells = tbl.querySelectorAll('tbody td, td');
-        for (const cell of cells) {
-        if (cell.textContent && cell.textContent.trim().length > 0) {
-          return true;}
-        }
-        return false;
-  }, TABLE_SELECTOR);
-
-  if (!hasData) {
-    console.warn('⚠️ 表格仍为空，尝试滚动或等待更多时间...');
-    await scrollTableContainer(targetFrame, TABLE_SELECTOR);
-  }
+    // -------------------------------------------------
+    //  轮询主逻辑：每 3 秒检查一次，最多 60 秒
+    // -------------------------------------------------
+    const POLL_INTERVAL_MS = 3000;   // 3 秒
+    const TIMEOUT_MS = 60000;        // 60 秒
+    const startTime = Date.now();
+    
+    let hasData = false;
+    while (Date.now() - startTime < TIMEOUT_MS) {
+    hasData = await checkHasData(targetFrame, TABLE_SELECTOR);
+    if (hasData) break; // 检测到有效数据，退出循环
+    
+    console.log('⏳ 表格暂无有效数据，等待 3 秒后再次检测...');
+    await new Promise(res => setTimeout(res, POLL_INTERVAL_MS));
+    }
+    
+    if (!hasData) {
+    console.warn('⚠️ 超时 60 秒仍未检测到表格数据，脚本结束。');
+    // await browser.close();
+    // return;
+    }
 
   // 8️⃣ 为子帧创建 CDP 会话并抓取 MHTML
   const client = await targetFrame._client;   // 同源帧才有此属性

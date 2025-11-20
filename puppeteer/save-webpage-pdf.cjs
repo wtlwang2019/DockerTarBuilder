@@ -99,7 +99,7 @@ async function autoScrollToBottom2(page) {
     await page.pdf({
     path: 'output/webpage.pdf',
     format: 'A4',
-    landscape: true,
+    // landscape: true,
     scale: 0.8,
     printBackground: true
     });

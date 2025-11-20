@@ -179,7 +179,7 @@ const outputPath = 'output/webpage.mhtml';
 // console.log('保存任务已启动...');
 
 
-// mhtml1
+// ================== mhtml1 ======================================
 
 // (async () => {
 //   const browser = await puppeteer.launch({headless: true});
@@ -198,6 +198,7 @@ const outputPath = 'output/webpage.mhtml';
 // })();
 
 
+// ================== mhtml2 ======================================
 // puppeteer-mhtml-first-iframe.js
 
 (async () => {
@@ -206,7 +207,7 @@ const outputPath = 'output/webpage.mhtml';
   const page = await browser.newPage();
 
   // 2️⃣ 打开包含 iframe 的页面
-  await page.goto('https://www.example.com/with-iframe', { waitUntil: 'networkidle2' });
+  await page.goto(targetUrl, { waitUntil: 'networkidle2' });
 
   // 3️⃣ 找到页面中的第一个 iframe
   const firstIframeHandle = await page.$('iframe');

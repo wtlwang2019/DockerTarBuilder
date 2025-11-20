@@ -218,7 +218,7 @@ const outputPath = 'output/webpage.mhtml';
     
     if (!hasRows) {
         console.warn('⚠️ 表格仍为空，尝试滚动...');
-        await autoScroll(iframePage);
+        await scrollTableContainer(iframePage, TABLE_SELECTOR);
     }
     
     // 5️⃣ 抓取 MHTML（此时只针对 iframe 页面本身）
@@ -249,7 +249,7 @@ const outputPath = 'output/webpage.mhtml';
 
   if (!hasRows) {
     console.warn('⚠️ 表格仍为空，尝试滚动或等待更多时间...');
-    await autoScroll(targetFrame);
+    await scrollTableContainer(targetFrame, TABLE_SELECTOR);
   }
 
   // 8️⃣ 为子帧创建 CDP 会话并抓取 MHTML
@@ -268,26 +268,53 @@ const outputPath = 'output/webpage.mhtml';
 })();
 
 /**
- * 自动滚动（适用于懒加载/分页的表格）
- * @param {import('puppeteer').Frame} frame
+ * 在表格所在的可滚动容器内部执行滚动，直至滚动到底部。
+ * @param {import('puppeteer').Frame} frame   子帧对象
+ * @param {string} tableSelector               表格的 CSS 选择器
  */
-async function autoScroll(frame) {
-  await frame.evaluate(async () => {
-    await new Promise((resolve) => {
-      let totalHeight = 0;
-      const distance = 200;
-      const timer = setInterval(() => {
-        const { scrollHeight } = document.body;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 100);
-    });
-  });
-}
+async function scrollTableContainer(frame, tableSelector) {
+  await frame.evaluate(async (sel) => {
+    // 1️⃣ 找到表格元素
+    const table = document.querySelector(sel);
+    if (!table) return;
 
+    // 2️⃣ 向上寻找最近的可滚动元素（overflow:auto/scroll 且可滚动）
+    function findScrollable(el) {
+      while (el && el !== document.body) {
+        const style = getComputedStyle(el);
+        const overflowY = style.overflowY;
+        const isScrollable = (overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
+        if (isScrollable) return el;
+        el = el.parentElement;
+      }
+      return null; // 没有专属滚动容器，使用 window
+    }
+
+    const scrollContainer = findScrollable(table) || window;
+
+    // 3️⃣ 滚动逻辑：每次滚动 distance 像素，直到到达底部
+    const distance = 200; // 每次滚动的像素，可根据实际情况调大/调小
+    const delay = 200;    // 两次滚动之间的等待时间（ms），给懒加载留时间
+
+    function sleep(ms) {
+      return new Promise(res => setTimeout(res, ms));
+    }
+
+    // 循环滚动
+    while (true) {
+      const previousScrollTop = scrollContainer.scrollTop || window.pageYOffset;
+      if (scrollContainer === window) {
+        window.scrollBy(0, distance);
+      } else {
+        scrollContainer.scrollTop += distance;
+      }
+      await sleep(delay);
+
+      const newScrollTop = scrollContainer.scrollTop || window.pageYOffset;
+      // 若滚动后位置未变化，说明已经到底部
+      if (newScrollTop === previousScrollTop) break;
+    }
+  }, tableSelector);
+}
 
 

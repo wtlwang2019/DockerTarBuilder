@@ -172,7 +172,7 @@ async function checkHasData(frame, selector) {
       const tbl = document.querySelector(sel);
       if (!tbl) return false;
       // 统计所有可能的单元格（tbody、thead、普通 td/th）
-      const cells = tbl.querySelectorAll('tbody td, tbody th, td, th');
+      const cells = tbl.querySelectorAll('tbody td, td');
       for (const cell of cells) {
         if (cell.textContent && cell.textContent.trim().length > 0) {
           return true; // 至少有一个非空单元格

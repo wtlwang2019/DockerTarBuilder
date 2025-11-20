@@ -165,16 +165,34 @@ async function savePageAsMHTML_JS(url, outputPath) {
 const targetUrl = process.env.WEBPAGE_URL;
 const outputPath = 'output/webpage.mhtml';
 
-savePageAsMHTML_JS(targetUrl, outputPath)
-  .then(() => {
-    // 当异步函数成功完成时执行
-    console.log('网页已成功保存。');
-  })
-  .catch((error) => {
-    // 当异步函数内部抛出错误时执行
-    console.error('保存网页时发生错误:', error);
-  });
+// savePageAsMHTML_JS(targetUrl, outputPath)
+//   .then(() => {
+//     // 当异步函数成功完成时执行
+//     console.log('网页已成功保存。');
+//   })
+//   .catch((error) => {
+//     // 当异步函数内部抛出错误时执行
+//     console.error('保存网页时发生错误:', error);
+//   });
 
-// 注意：这行代码会立即执行，不会等待上面的异步操作完成
-console.log('保存任务已启动...');
+// // 注意：这行代码会立即执行，不会等待上面的异步操作完成
+// console.log('保存任务已启动...');
+
+(async () => {
+  const browser = await puppeteer.launch({headless: true});
+  const page = await browser.newPage();
+  const targetUrl = process.env.WEBPAGE_URL;
+  await page.goto(targetUrl, {waitUntil: 'networkidle2'});
+
+  // CDP 命令获取 MHTML
+  const client = await page.target().createCDPSession();
+  const {data} = await client.send('Page.captureSnapshot', {});
+
+  // const fs = require('fs');
+  fs.writeFileSync('output/webpage.mhtml', data, 'utf8');
+
+  await browser.close();
+})();
+
+
 

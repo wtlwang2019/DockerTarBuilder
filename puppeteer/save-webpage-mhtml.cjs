@@ -71,61 +71,61 @@ async function autoScrollToBottom2(page) {
 }
 
 
-async function savePageAsMHTML_JS(url, outputPath) {
-  let browser;
-  try {
-    browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+// async function savePageAsMHTML_JS(url, outputPath) {
+//   let browser;
+//   try {
+//     browser = await puppeteer.launch({
+//       headless: 'new',
+//       args: ['--no-sandbox', '--disable-setuid-sandbox'],
+//     });
 
-    const page = await browser.newPage();
+//     const page = await browser.newPage();
 
-    console.log(`正在加载页面: ${url}`);
-    await page.goto(url, {
-      waitUntil: 'networkidle2',
-      timeout: 60000,
-    });
-    console.log('页面加载完成。');
+//     console.log(`正在加载页面: ${url}`);
+//     await page.goto(url, {
+//       waitUntil: 'networkidle2',
+//       timeout: 60000,
+//     });
+//     console.log('页面加载完成。');
 
-    // 使用标准的 setTimeout 实现延迟，等待动态内容渲染
-    console.log('等待动态内容渲染... (3秒)');
-    await new Promise(resolve => setTimeout(resolve, 3000)); // 等待3秒
+//     // 使用标准的 setTimeout 实现延迟，等待动态内容渲染
+//     console.log('等待动态内容渲染... (3秒)');
+//     await new Promise(resolve => setTimeout(resolve, 3000)); // 等待3秒
 
-    console.log('在浏览器中执行 JS 以生成 MHTML...');
-    // 注入并执行JS来获取MHTML内容
-    const mhtmlContent = await page.evaluate(async () => {
-      // 检查浏览器是否支持这个实验性API
-      if (typeof document.documentElement.convertToMHTML !== 'function') {
-        throw new Error('当前浏览器不支持 convertToMHTML API');
-      }
+//     console.log('在浏览器中执行 JS 以生成 MHTML...');
+//     // 注入并执行JS来获取MHTML内容
+//     const mhtmlContent = await page.evaluate(async () => {
+//       // 检查浏览器是否支持这个实验性API
+//       if (typeof document.documentElement.convertToMHTML !== 'function') {
+//         throw new Error('当前浏览器不支持 convertToMHTML API');
+//       }
       
-      // 调用浏览器内部方法生成 MHTML Blob
-      const mhtmlBlob = await document.documentElement.convertToMHTML();
+//       // 调用浏览器内部方法生成 MHTML Blob
+//       const mhtmlBlob = await document.documentElement.convertToMHTML();
 
-      // 将 Blob 转换为文本
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject(e);
-        reader.readAsText(mhtmlBlob, 'UTF-8');
-      });
-    });
+//       // 将 Blob 转换为文本
+//       return new Promise((resolve, reject) => {
+//         const reader = new FileReader();
+//         reader.onload = (e) => resolve(e.target.result);
+//         reader.onerror = (e) => reject(e);
+//         reader.readAsText(mhtmlBlob, 'UTF-8');
+//       });
+//     });
 
-    // 将MHTML内容写入文件
-    console.log('正在将 MHTML 内容写入文件');
-    fs.writeFileSync(outputPath, mhtmlContent, 'utf8');
+//     // 将MHTML内容写入文件
+//     console.log('正在将 MHTML 内容写入文件');
+//     fs.writeFileSync(outputPath, mhtmlContent, 'utf8');
 
-    console.log(`成功保存 MHTML 文件到: ${path.resolve(outputPath)}`);
+//     console.log(`成功保存 MHTML 文件到: ${path.resolve(outputPath)}`);
 
-  } catch (error) {
-    console.error('保存 MHTML 时发生错误:', error);
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
-  }
-}
+//   } catch (error) {
+//     console.error('保存 MHTML 时发生错误:', error);
+//   } finally {
+//     if (browser) {
+//       await browser.close();
+//     }
+//   }
+// }
 
 // --- 使用示例 ---
 const targetUrl = process.env.WEBPAGE_URL;

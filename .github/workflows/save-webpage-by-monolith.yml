@@ -26,6 +26,7 @@ jobs:
         run: |
           id
           monolith --help
+          # 下载包含有iframe的网页时，不能获取iframe里的内容；动态网页下载的html里body为空，报错：<noscript>You need to enable JavaScript to run this app.</noscript>
           # chromium --headless --window-size=1920,1080 --run-all-compositor-stages-before-draw --virtual-time-budget=9000 --incognito --dump-dom "$WEBPAGE_URL" | monolith - -I -b "$WEBPAGE_URL" -o webpage.html
           monolith -t 60 "$WEBPAGE_URL"  -o webpage.html
         env:

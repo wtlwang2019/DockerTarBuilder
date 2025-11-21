@@ -8,7 +8,7 @@ on:
         required: true
         default: 'https://github.com'
       option:
-        description: 'wget的option，例如：-np'
+        description: 'wget的option，例如：-np -l 2'
         required: true
         default: ''        
 

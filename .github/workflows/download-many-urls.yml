@@ -21,14 +21,14 @@ jobs:
           # sudo apt update && sudo apt install -y chromium
           # sudo snap install chromium
   
-      - name: Create HTML from Webpage
+      - name: Download urls
         run: |
           id
           urlFilePath=${{ inputs.urlFilePath }}
           curl --help
           mkdir output
           cd output
-          curl  -O -K "$urlFilePath"
+          xargs -n 1 curl -O < "$urlFilePath"
           ls
         env:
           # 在这里设置你的 URL 环境变量

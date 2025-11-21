@@ -1,4 +1,4 @@
-name: Save WebPage by monolith
+name: Save WebPage by wget
 
 on: 
   workflow_dispatch:

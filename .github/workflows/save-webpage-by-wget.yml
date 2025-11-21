@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install monolith
+      - name: Install dependency
         run: |
           id
           # sudo apt update && sudo apt install -y chromium

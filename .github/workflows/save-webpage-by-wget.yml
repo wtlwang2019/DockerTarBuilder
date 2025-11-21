@@ -1,0 +1,40 @@
+name: Save WebPage by monolith
+
+on: 
+  workflow_dispatch:
+    inputs:
+      url:
+        description: '网页的url'
+        required: true
+        default: 'https://github.com'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install monolith
+        run: |
+          id
+          # sudo apt update && sudo apt install -y chromium
+          # sudo snap install chromium
+  
+      - name: Create HTML from Webpage
+        run: |
+          id
+          wget --help
+          mkdir output
+          cd output
+          wget -mkEpnH --user-agent="Mozilla/5.0"  --random-wait  "$WEBPAGE_URL"
+        env:
+          # 在这里设置你的 URL 环境变量
+          WEBPAGE_URL: ${{ inputs.url }} 
+  
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webpage-html
+          path: ${{ github.workspace }}/output
+          retention-days: 2  # 将保留天数设置为 1 天 最多可设置90天

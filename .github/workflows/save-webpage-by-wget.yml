@@ -26,6 +26,7 @@ jobs:
           id
           wget --help
           # 测试网页包含iframe: https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
+          # 测试网页包含表格需要滑动翻页：https://open-llm-leaderboard-open-llm-leaderboard.hf.space/#/
           mkdir output
           cd output
           wget -mkEpnH --user-agent="Mozilla/5.0"  --random-wait  "$WEBPAGE_URL"

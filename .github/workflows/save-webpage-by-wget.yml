@@ -8,12 +8,12 @@ on:
         required: true
         default: 'https://github.com'
       level:
-        description: 'wget最大递归深度'
+        description: 'wget最大递归深度；网页内容多的话一定要限制递归深度'
         required: true
         default: '2'  
         
       option:
-        description: 'wget的option，网页内容多的话一定要限制递归深度 例如：-np -l 2'
+        description: 'wget的option， 例如：-np '
         required: true
         default: ''        
 

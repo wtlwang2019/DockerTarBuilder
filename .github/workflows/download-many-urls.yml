@@ -1,0 +1,62 @@
+name: Download many URLs
+
+on: 
+  workflow_dispatch:
+    inputs:
+      urlFilePath:
+        description: 'urls所在的文件名'
+        required: true
+        default: '../urls2download.txt'   
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependency
+        run: |
+          id
+          # sudo apt update && sudo apt install -y chromium
+          # sudo snap install chromium
+  
+      - name: Create HTML from Webpage
+        run: |
+          id
+          urlFilePath=${{ inputs.urlFilePath }}
+          curl --help
+          mkdir output
+          cd output
+          curl  -O -K "$urlFilePath"
+          ls
+        env:
+          # 在这里设置你的 URL 环境变量
+          WEBPAGE_URL: ${{ inputs.url }} 
+    
+      - name: Clean up file names
+        run: |
+          cd output
+          # 定义非法字符集
+          ILLEGAL_CHARS='"?*:<>|'
+          
+          # 查找所有包含非法字符的文件
+          find . -type f | while read -r file; do
+            # 检查文件名是否包含非法字符
+            if [[ "$file" =~ [$ILLEGAL_CHARS] ]]; then
+              # 替换所有非法字符为下划线
+              new_file=$(echo "$file" | tr "[$ILLEGAL_CHARS]" "_")
+              # 确保目录存在
+              mkdir -p "$(dirname "$new_file")"
+              # 重命名文件
+              mv "$file" "$new_file"
+              echo "Renamed: $file -> $new_file"
+            fi
+          done          
+  
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webpage-html
+          path: ${{ github.workspace }}/output
+          retention-days: 2  # 将保留天数设置为 1 天 最多可设置90天

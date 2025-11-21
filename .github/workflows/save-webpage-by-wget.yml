@@ -7,6 +7,11 @@ on:
         description: '网页的url'
         required: true
         default: 'https://github.com'
+      level:
+        description: 'wget最大递归深度'
+        required: true
+        default: '2'  
+        
       option:
         description: 'wget的option，网页内容多的话一定要限制递归深度 例如：-np -l 2'
         required: true
@@ -29,12 +34,13 @@ jobs:
         run: |
           id
           option=${{ inputs.option }}
+          level=${{ inputs.level }}
           wget --help
           # 测试网页包含iframe: https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
           # 测试网页包含表格需要滑动翻页：https://open-llm-leaderboard-open-llm-leaderboard.hf.space/#/
           mkdir output
           cd output
-          wget -mkEpnH --user-agent="Mozilla/5.0"  $option --wait=1 --random-wait  "$WEBPAGE_URL"  || echo 0
+          wget -mkEpnH --user-agent="Mozilla/5.0"  $option -l "$level" --wait=1 --random-wait  "$WEBPAGE_URL"  || echo 0
         env:
           # 在这里设置你的 URL 环境变量
           WEBPAGE_URL: ${{ inputs.url }} 

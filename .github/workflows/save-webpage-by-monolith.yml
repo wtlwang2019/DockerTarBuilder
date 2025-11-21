@@ -19,15 +19,15 @@ jobs:
         run: |
           id
           # sudo apt update && sudo apt install -y chromium
-          sudo snap install chromium
+          # sudo snap install chromium
           sudo snap install monolith
   
       - name: Create HTML from Webpage
         run: |
           id
           monolith --help
-          chromium --headless --window-size=1920,1080 --run-all-compositor-stages-before-draw --virtual-time-budget=9000 --incognito --dump-dom "$WEBPAGE_URL" | monolith - -I -b "$WEBPAGE_URL" -o webpage.html
-          # monolith "$WEBPAGE_URL"  -o webpage.html
+          # chromium --headless --window-size=1920,1080 --run-all-compositor-stages-before-draw --virtual-time-budget=9000 --incognito --dump-dom "$WEBPAGE_URL" | monolith - -I -b "$WEBPAGE_URL" -o webpage.html
+          monolith -t 60 "$WEBPAGE_URL"  -o webpage.html
         env:
           # 在这里设置你的 URL 环境变量
           WEBPAGE_URL: ${{ inputs.url }} 

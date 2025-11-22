@@ -11,7 +11,10 @@ on:
         description: 'wget最大递归深度；网页内容多的话一定要限制递归深度'
         required: true
         default: '2'  
-        
+      waitSec:
+        description: '请求之间的等待时间，单位：秒'
+        required: true
+        default: '1'        
       option:
         description: 'wget的option， 例如：-np -mkEpnH'
         required: true
@@ -36,6 +39,7 @@ jobs:
           id
           option="${{ inputs.option }}"
           level="${{ inputs.level }}"
+          waitSec="${{ inputs.waitSec }}"
           is_array() {
               # $1 为变量名
               # 通过 declare -p 捕获属性，判断是否包含 -a 或 -A
@@ -53,7 +57,7 @@ jobs:
           # 测试网页包含表格需要滑动翻页：https://open-llm-leaderboard-open-llm-leaderboard.hf.space/#/
           mkdir output
           cd output
-          wget  "${arr[@]}"  --user-agent="Mozilla/5.0"  -l "$level" --wait=1 --random-wait  "$WEBPAGE_URL"  || echo 0
+          wget  "${arr[@]}"  -l "$level" --user-agent="Mozilla/5.0"  "--wait=$waitSec" --random-wait  "$WEBPAGE_URL"  || echo 0
           ls
         env:
           # 在这里设置你的 URL 环境变量

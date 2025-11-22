@@ -55,6 +55,7 @@ jobs:
           is_array arr
           # 测试网页包含iframe: https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
           # 测试网页包含表格需要滑动翻页：https://open-llm-leaderboard-open-llm-leaderboard.hf.space/#/
+          # 正则表达式排除指定的url:--regex-type=pcre  --reject-regex .*hl=(?!en)[^&]*  -np -r
           mkdir output
           cd output
           wget  "${arr[@]}"  -l "$level" --user-agent="Mozilla/5.0"  "--wait=$waitSec" --random-wait  "$WEBPAGE_URL"  || echo 0

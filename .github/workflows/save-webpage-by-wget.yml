@@ -27,6 +27,7 @@ jobs:
       - name: Install dependency
         run: |
           id
+          wget --help
           # sudo apt update && sudo apt install -y chromium
           # sudo snap install chromium
   
@@ -35,8 +36,19 @@ jobs:
           id
           option="${{ inputs.option }}"
           level="${{ inputs.level }}"
-          mapfile -t arr <<< "$option"
-          wget --help
+          is_array() {
+              # $1 为变量名
+              # 通过 declare -p 捕获属性，判断是否包含 -a 或 -A
+              if declare -p "$1" 2>/dev/null | grep -qE 'declare -[aA] '; then
+                  echo "$1 是数组"
+              else
+                  echo "$1 是普通字符串"
+              fi
+          }
+          is_array option
+          # mapfile -t arr <<< "$option"
+          arr=($option)
+          is_array arr
           # 测试网页包含iframe: https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
           # 测试网页包含表格需要滑动翻页：https://open-llm-leaderboard-open-llm-leaderboard.hf.space/#/
           mkdir output

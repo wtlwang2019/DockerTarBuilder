@@ -10,7 +10,7 @@ on:
       level:
         description: 'wget最大递归深度；网页内容多的话一定要限制递归深度'
         required: true
-        default: '2'  
+        default: '1'  
       waitSec:
         description: '请求之间的等待时间，单位：秒'
         required: true

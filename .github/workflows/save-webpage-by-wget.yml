@@ -33,8 +33,8 @@ jobs:
       - name: Create HTML from Webpage
         run: |
           id
-          option=${{ inputs.option }}
-          level=${{ inputs.level }}
+          option="${{ inputs.option }}"
+          level="${{ inputs.level }}"
           mapfile -t arr <<< "$option"
           wget --help
           # 测试网页包含iframe: https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard

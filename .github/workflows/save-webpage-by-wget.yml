@@ -13,7 +13,7 @@ on:
         default: '2'  
         
       option:
-        description: 'wget的option， 例如：-np '
+        description: 'wget的option， 例如：-np -mkEpnH'
         required: true
         default: ''        
 
@@ -35,12 +35,13 @@ jobs:
           id
           option=${{ inputs.option }}
           level=${{ inputs.level }}
+          mapfile -t arr <<< "$option"
           wget --help
           # 测试网页包含iframe: https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard
           # 测试网页包含表格需要滑动翻页：https://open-llm-leaderboard-open-llm-leaderboard.hf.space/#/
           mkdir output
           cd output
-          wget -mkEpnH --user-agent="Mozilla/5.0"  $option -l "$level" --wait=1 --random-wait  "$WEBPAGE_URL"  || echo 0
+          wget  "${arr[@]}"  --user-agent="Mozilla/5.0"  -l "$level" --wait=1 --random-wait  "$WEBPAGE_URL"  || echo 0
           ls
         env:
           # 在这里设置你的 URL 环境变量

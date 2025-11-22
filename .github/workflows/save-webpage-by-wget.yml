@@ -14,7 +14,7 @@ on:
       waitSec:
         description: '请求之间的等待时间，单位：秒'
         required: true
-        default: '1'        
+        default: '0.5'        
       option:
         description: 'wget的option， 例如：-np -mkEpnH'
         required: true

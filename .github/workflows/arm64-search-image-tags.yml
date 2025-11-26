@@ -1,4 +1,4 @@
-name: ARM64-Search-Image-tags
+name: Search-ARM64-Image-tags
 
 on:
   workflow_dispatch:
@@ -40,7 +40,6 @@ jobs:
           # python get_arm64_image_tags.py
           # tar -czvf tags.tar.gz *.txt *.json
           rm *.txt || echo 0
-          cp *.json ../
 
       - name: List generated files (debug step)
         run: |
@@ -69,7 +68,7 @@ jobs:
         uses: softprops/action-gh-release@v2.1.0
         with:
           tag_name: DockerTarBuilder-ARM64
-          files: ${{ github.workspace }}/*.json
+          files: ${{ github.workspace }}/arm64/*.json
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

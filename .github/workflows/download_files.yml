@@ -11,7 +11,14 @@ on:
         description: '请填写保存的文件名,不指定名称输入null'
         required: true
         default: 'result.txt'
-        
+      options:
+        description: 'curl 参数，例如：-X POST'
+        required: false
+        default: ''        
+      data_options:
+        description: 'curl 数据参数，例如：-d "download=1" '
+        required: false
+        default: ''         
 
 jobs:
   pull_and_package:
@@ -26,10 +33,12 @@ jobs:
           cd .download
           url="${{ inputs.url }}"
           filename="${{ inputs.target_filename }}"
+          options="${{ inputs.options }}"
           opt="-o ${filename}"
+          dataOpts="${{ inputs.data_options }}"
           if [ "$filename" = "null" ]; then opt="-O" ; fi
-          echo "curl -L ${opt} ${url}"
-          curl -L $opt "${url}"
+          echo "curl -L ${options} ${opt}   ${url}  ${dataOpts}"
+          curl -L ${options} ${opt}  "${url}"  ${dataOpts}
           ls -l
           cd ..
           

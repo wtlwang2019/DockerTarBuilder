@@ -46,8 +46,8 @@ jobs:
             ls
             cargo build --release --verbose
             ls
-            ll target
-            ll target/*/
+            ls -l target
+            ls -l target/*/
             # mv *.tar.gz ../
 
   

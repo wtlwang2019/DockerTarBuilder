@@ -50,12 +50,22 @@ jobs:
             ls -l target/release
             # mv *.tar.gz ../
 
-  
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+
+      - name: Upload Bin as release assets
+        uses: softprops/action-gh-release@v2.1.0
         with:
-          name: rust-artifact
-          path: target/release/${{ env.BIN_NAME }}
-          retention-days: 5  # 将保留天数设置为 1 天 最多可设置90天
+          tag_name: RUST-BIN-AMD64
+          files: ${{ github.workspace }}/target/release/${{ env.BIN_NAME }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BIN_NAME: ${{ inputs.bin_name }}
+  
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: rust-artifact
+      #     path: target/release/${{ env.BIN_NAME }}
+      #     retention-days: 5  # 将保留天数设置为 1 天 最多可设置90天
+      #   env:
+      #     BIN_NAME: ${{ inputs.bin_name }}

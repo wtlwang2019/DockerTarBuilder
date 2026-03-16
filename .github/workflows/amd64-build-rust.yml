@@ -1,0 +1,57 @@
+name: Build Other Repository Rust
+
+on: 
+  workflow_dispatch:
+    inputs:
+      project_path:
+        description: '仓库路径'
+        required: true
+        default: 'wtlwang2019/llama.cpp'
+      image_name:
+        description: '镜像名称'
+        required: true
+        default: 'llama-full'        
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout other repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.project_path }}
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check ENV
+        run: |
+          pwd
+          ls
+          ls -l 
+          df -h
+
+      # 3. 缓存 Cargo 依赖（加速编译，避免重复下载）
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: .
+
+      #  编译项目（--release 生成优化后的发布版本）          
+      - name: Build
+        env: 
+          image: ${{ inputs.image_name }}
+        run: |
+            pwd
+            ls
+            cargo build --release --verbose
+            ls
+            # mv *.tar.gz ../
+
+  
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: rust-artifact
+      #     path: ${{ github.workspace }}/target/release/*
+      #     retention-days: 5  # 将保留天数设置为 1 天 最多可设置90天
